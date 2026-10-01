@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HYMF Araştırma Grubu Portalı
 
-## Getting Started
+Ankara Üniversitesi Fen Fakültesi / Enstitüsü **Hesaplamalı Yoğun Madde Fiziği (HYMF)** araştırma grubuna özel, rol tabanlı erişim kontrollü (RBAC) akademik yönetim ve paylaşım platformu.
 
-First, run the development server:
+---
 
+## 👥 Geliştirici Ekip (Collaborators)
+- **Repo Sahibi:** [@sibel441](https://github.com/sibel441)
+- **Geliştirici:** [@eigen-ml](https://github.com/eigen-ml)
+
+---
+
+## 🚀 Projeyi Kendi Bilgisayarınızda Çalıştırma (Hızlı Başlangıç)
+
+Eğer projeye yeni katıldıysanız (örn: `@eigen-ml`), aşağıdaki 4 adımı izleyerek projeyi 1 dakikada ayağa kaldırabilirsiniz:
+
+### 1. Repoyu Klonlayın
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/sibel441/hymf-portal.git
+cd hymf-portal
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Bağımlılıkları Yükleyin
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Çevre Değişkenlerini (.env.local) Hazırlayın
+Proje ana dizinindeki `.env.local.example` dosyasının bir kopyasını oluşturup adını `.env.local` yapın:
+```bash
+cp .env.local.example .env.local
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`.env.local` dosyasının içini Supabase ve Telegram bilgileriyle doldurun:
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://fkjjpjvozrexaxpvevum.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_publishable_or_anon_key
+TELEGRAM_BOT_TOKEN=your_bot_token
+TELEGRAM_CHAT_ID=-100xxxxxxxxxx
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
 
-## Learn More
+### 4. Geliştirme Sunucusunu Başlatın
+```bash
+npm run dev
+```
+Tarayıcınızda [http://localhost:3000](http://localhost:3000) adresini açarak portala erişebilirsiniz!
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📁 Proje Klasör Yapısı ve Modüller
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+hymf-portal/
+├── src/
+│   ├── app/
+│   │   ├── page.tsx               # Ana Sayfa & Dashboard (Karşılama, misyon, hızlı özet)
+│   │   ├── kilavuzlar/page.tsx    # TRUBA SSH/Slurm, VASP INCAR, LAMMPS MD, Okul VPN
+│   │   ├── formlar/page.tsx       # Fen Bilimleri Enstitüsü (Fizik & Fizik Müh.) belgeleri
+│   │   ├── uyeler/page.tsx        # Üye Vitrini (Akademik profiller, ORCID, Scholar)
+│   │   ├── duyurular/page.tsx     # Duyuru Panosu & Telegram Bildirim Akışı
+│   │   ├── kaynaklar/page.tsx     # Ortak Havuz (Makale PDF, linkler, Python/Slurm scriptleri)
+│   │   ├── dersler/page.tsx       # Lisansüstü dersler, syllabus, haftalık slaytlar
+│   │   ├── toplantilar/page.tsx   # Haftalık seminer takvimi ve sunum PDF'leri
+│   │   ├── calisma-alani/page.tsx # Kişisel Çalışma Alanı (RBAC Gizli Sayfa & Audit Log)
+│   │   ├── giris/page.tsx         # Giriş yap, şifremi unuttum & hızlı rol test modülü
+│   │   ├── kayit/page.tsx         # Yeni araştırmacı kayıt formu
+│   │   ├── profil/page.tsx        # Kişisel profil düzenleme
+│   │   └── api/telegram/route.ts  # Telegram Bot API entegrasyonu (Acil/Toplantı bildirimi)
+│   ├── components/                # Navbar, Footer, CodeBlock, RoleBadge
+│   ├── context/AuthContext.tsx    # Rol bazlı erişim kontrolü (Hoca, Yönetici, Araştırmacı)
+│   ├── lib/mockData.ts            # Başlangıç verileri ve modeller
+│   └── types/database.ts          # TypeScript veri şemaları
+├── supabase/
+│   └── schema.sql                 # PostgreSQL tabloları, enum'lar ve RLS politikaları
+└── .env.local.example             # Çevre değişkenleri şablonu
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🔒 Rol ve Yetki Matrisi (RBAC)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Sorumlu Hocalar (`hoca`):** Tüm öğrencilerin gizli çalışma alanlarını görebilir, geri bildirim notu bırakabilir, ders materyali ve duyuru ekleyebilir.
+2. **Yöneticiler (`yonetici` - 2 Öğrenci):** Hoca adına ders asiste edebilir, tüm öğrenci çalışma alanlarını denetleyebilir, tüm kaynakları yönetebilir.
+3. **Normal Araştırmacılar (`arastirmaci`):** Yalnızca kendi tez/simülasyon çalışma alanını görür ve düzenler (diğer öğrencilerin verilerine erişim 403 engellidir). Duyuru yapabilir, script ve kaynak paylaşabilir.
