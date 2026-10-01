@@ -34,51 +34,52 @@ export function Navbar() {
   const navLinks = [
     { href: '/', label: 'Ana Sayfa', icon: Home },
     { href: '/kilavuzlar', label: 'Kılavuzlar', icon: Wrench },
-    { href: '/formlar', label: 'Resmi Formlar', icon: FileText },
-    { href: '/uyeler', label: 'Üye Vitrini', icon: Users },
+    { href: '/formlar', label: 'Formlar', icon: FileText },
+    { href: '/uyeler', label: 'Üyeler', icon: Users },
     { href: '/duyurular', label: 'Duyurular', icon: Bell },
-    { href: '/kaynaklar', label: 'Kaynak Havuzu', icon: BookOpen },
+    { href: '/kaynaklar', label: 'Kaynaklar', icon: BookOpen },
     { href: '/dersler', label: 'Dersler', icon: GraduationCap },
     { href: '/toplantilar', label: 'Toplantılar', icon: Calendar },
-    {
-      href: '/calisma-alani',
-      label: 'Çalışma Alanı',
-      icon: Lock,
-      isSpecial: true,
-    },
   ];
 
+  const initials = profile?.full_name
+    .split(' ')
+    .filter((n) => !n.endsWith('.'))
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join('');
+
   return (
-    <header className="sticky top-0 z-50 bg-slate-900 border-b border-slate-800 text-slate-100 shadow-md">
+    <header className="sticky top-0 z-50 text-slate-100">
       {/* Üst Üniversite Şeridi */}
-      <div className="bg-slate-950/80 px-4 py-1.5 border-b border-slate-800/80 text-xs">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="font-semibold tracking-wide text-slate-300">
-              ANKARA ÜNİVERSİTESİ
-            </span>
-            <span className="text-slate-600">|</span>
-            <span className="text-slate-400">
-              Fen Fakültesi / Enstitüsü • Hesaplamalı Yoğun Madde Fiziği (HYMF)
+      <div className="bg-slate-950 border-b border-slate-800/70 text-[11px]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-8 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className="font-semibold tracking-[0.14em] text-slate-300">ANKARA ÜNİVERSİTESİ</span>
+            <span className="hidden sm:inline w-px h-3 bg-slate-700"></span>
+            <span className="hidden sm:inline text-slate-500 truncate">
+              Fen Fakültesi · Hesaplamalı Yoğun Madde Fiziği
             </span>
           </div>
 
-          {/* Test/Rol Değiştirici Hızlı Araç Çubuğu */}
-          <div className="relative">
+          {/* Test/Rol Değiştirici */}
+          <div className="relative shrink-0">
             <button
               onClick={() => setRoleSwitcherOpen(!roleSwitcherOpen)}
-              className="flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-medium transition cursor-pointer border border-slate-700"
+              className="flex items-center gap-1.5 px-2 py-0.5 rounded-md text-slate-400 hover:text-slate-200 hover:bg-slate-800/80 transition cursor-pointer"
               title="Test için kullanıcı rolünü anında değiştirin"
             >
               <ShieldCheck className="w-3 h-3 text-amber-400" />
-              <span>Rolü Değiştir (Test): <b>{profile?.full_name?.split(' ')[0]}</b></span>
+              <span>
+                Demo rolü: <b className="text-slate-200 font-medium">{profile?.full_name?.split(' ').slice(-1)[0] ?? 'Misafir'}</b>
+              </span>
               <ChevronDown className="w-3 h-3" />
             </button>
 
             {roleSwitcherOpen && (
-              <div className="absolute right-0 mt-1 w-72 bg-slate-900 border border-slate-700 rounded-lg shadow-xl p-2 z-50 text-xs">
-                <div className="px-2 py-1 text-slate-400 font-semibold border-b border-slate-800 mb-1">
-                  Rol Tabanlı Erişim Testi (RBAC)
+              <div className="absolute right-0 mt-2 w-72 bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 rounded-xl shadow-2xl shadow-black/50 p-1.5 z-50 text-xs">
+                <div className="px-2.5 py-2 text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
+                  Rol tabanlı erişim testi
                 </div>
                 {INITIAL_PROFILES.map((p) => (
                   <button
@@ -87,13 +88,13 @@ export function Navbar() {
                       loginAs(p.id);
                       setRoleSwitcherOpen(false);
                     }}
-                    className={`w-full text-left px-2 py-2 rounded flex items-center justify-between hover:bg-slate-800 transition ${
-                      profile?.id === p.id ? 'bg-slate-800 text-white font-semibold' : 'text-slate-300'
+                    className={`w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between gap-2 hover:bg-slate-800 transition ${
+                      profile?.id === p.id ? 'bg-slate-800/80' : ''
                     }`}
                   >
-                    <div>
-                      <div className="text-slate-200">{p.full_name}</div>
-                      <div className="text-[10px] text-slate-400">{p.academic_title}</div>
+                    <div className="min-w-0">
+                      <div className="text-slate-100 truncate">{p.full_name}</div>
+                      <div className="text-[10px] text-slate-500 truncate">{p.academic_title}</div>
                     </div>
                     <RoleBadge role={p.role} />
                   </button>
@@ -105,164 +106,160 @@ export function Navbar() {
       </div>
 
       {/* Ana Navbar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo / Grup Adı */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-red-900 via-slate-800 to-slate-900 border border-red-700/50 flex items-center justify-center font-serif text-lg font-bold text-slate-100 shadow-inner">
-              Ψ
-            </div>
-            <div>
-              <span className="text-lg font-bold tracking-tight text-white group-hover:text-red-300 transition-colors">
-                HYMF Portal
-              </span>
-              <span className="block text-[11px] font-mono text-slate-400 leading-none">
-                hymf.ankara.edu.tr
-              </span>
-            </div>
-          </Link>
+      <div className="bg-slate-950/70 backdrop-blur-xl border-b border-slate-800/70">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-16 gap-6">
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-3 group shrink-0">
+              <div className="relative w-9 h-9 rounded-lg bg-gradient-to-br from-red-700 to-red-950 ring-1 ring-red-500/30 flex items-center justify-center font-serif text-xl text-white shadow-lg shadow-red-950/50">
+                Ψ
+              </div>
+              <div className="leading-tight">
+                <span className="block font-serif text-[19px] text-white tracking-tight">
+                  HYMF <span className="italic text-slate-400">Portal</span>
+                </span>
+                <span className="block text-[10px] font-mono text-slate-500">hymf.ankara.edu.tr</span>
+              </div>
+            </Link>
 
-          {/* Masaüstü Menü Linkleri */}
-          <nav className="hidden lg:flex items-center gap-1">
-            {navLinks.map((link) => {
+            {/* Masaüstü Menü */}
+            <nav className="hidden xl:flex items-center gap-0.5">
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`relative px-3 py-2 text-[13px] rounded-md transition-colors ${
+                      isActive ? 'text-white' : 'text-slate-400 hover:text-slate-100'
+                    }`}
+                  >
+                    {link.label}
+                    {isActive && (
+                      <span className="absolute left-3 right-3 -bottom-[13px] h-[2px] rounded-full bg-gradient-to-r from-red-500 to-amber-400"></span>
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* Sağ taraf */}
+            <div className="hidden xl:flex items-center gap-2 shrink-0">
+              <Link
+                href="/calisma-alani"
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] border transition ${
+                  pathname === '/calisma-alani'
+                    ? 'bg-amber-500/15 text-amber-200 border-amber-500/40'
+                    : 'text-amber-300/90 border-amber-500/25 hover:bg-amber-500/10'
+                }`}
+              >
+                <Lock className="w-3.5 h-3.5" />
+                Çalışma Alanı
+              </Link>
+
+              {profile ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    className="flex items-center gap-1.5 p-1 pr-2 rounded-full hover:bg-slate-800/80 transition cursor-pointer"
+                    aria-label="Kullanıcı menüsü"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-600 to-slate-800 ring-1 ring-slate-600 flex items-center justify-center text-[11px] font-semibold text-white">
+                      {initials}
+                    </div>
+                    <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
+                  </button>
+
+                  {userMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-64 bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 rounded-xl shadow-2xl shadow-black/50 p-1.5 z-50 text-[13px]">
+                      <div className="px-3 py-2.5 mb-1 border-b border-slate-800">
+                        <div className="font-medium text-slate-100">{profile.full_name}</div>
+                        <div className="text-[11px] text-slate-500">{profile.email}</div>
+                        <div className="mt-2">
+                          <RoleBadge role={role} />
+                        </div>
+                      </div>
+                      <Link
+                        href="/profil"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white"
+                      >
+                        <User className="w-4 h-4 text-slate-500" />
+                        Akademik Profilim
+                      </Link>
+                      <Link
+                        href="/calisma-alani"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white"
+                      >
+                        <Lock className="w-4 h-4 text-amber-400" />
+                        Kişisel Çalışma Alanım
+                      </Link>
+                      <button
+                        onClick={() => {
+                          logout();
+                          setUserMenuOpen(false);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-red-300 hover:bg-red-950/40 text-left"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Çıkış Yap
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center gap-1">
+                  <Link
+                    href="/giris"
+                    className="px-3 py-1.5 text-[13px] text-slate-300 hover:text-white rounded-lg transition"
+                  >
+                    Giriş
+                  </Link>
+                  <Link
+                    href="/kayit"
+                    className="px-3.5 py-1.5 text-[13px] font-medium text-white bg-red-700 hover:bg-red-600 rounded-lg transition shadow-md shadow-red-950/40"
+                  >
+                    Kayıt Ol
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Mobil Menü Butonu */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="xl:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+              aria-label="Menü"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobil Menü İçeriği */}
+        {mobileMenuOpen && (
+          <div className="xl:hidden px-4 pt-2 pb-4 border-t border-slate-800/70 grid grid-cols-2 gap-1">
+            {[...navLinks, { href: '/calisma-alani', label: 'Çalışma Alanı', icon: Lock }, { href: '/profil', label: 'Profilim', icon: User }].map((link) => {
               const Icon = link.icon;
               const isActive = pathname === link.href;
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                    link.isSpecial
-                      ? isActive
-                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                        : 'text-amber-300/90 hover:bg-amber-950/40 hover:text-amber-200 border border-amber-600/30'
-                      : isActive
-                      ? 'bg-slate-800 text-white font-semibold shadow-sm'
-                      : 'text-slate-300 hover:bg-slate-800/70 hover:text-white'
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm ${
+                    isActive ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800/70 hover:text-white'
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${link.isSpecial ? 'text-amber-400' : 'text-slate-400'}`} />
-                  <span>{link.label}</span>
+                  <Icon className={`w-4 h-4 ${link.href === '/calisma-alani' ? 'text-amber-400' : 'text-slate-500'}`} />
+                  {link.label}
                 </Link>
               );
             })}
-          </nav>
-
-          {/* Kullanıcı Menüsü / Profil */}
-          <div className="hidden lg:flex items-center gap-3">
-            {profile ? (
-              <div className="relative">
-                <button
-                  onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg hover:bg-slate-800 transition cursor-pointer text-left"
-                >
-                  <div className="w-8 h-8 rounded-full bg-slate-700 border border-slate-600 flex items-center justify-center text-xs font-semibold text-white overflow-hidden">
-                    {profile.full_name
-                      .split(' ')
-                      .map((n) => n[0])
-                      .slice(0, 2)
-                      .join('')}
-                  </div>
-                  <div className="leading-tight">
-                    <div className="text-xs font-semibold text-slate-100">{profile.full_name}</div>
-                    <div className="text-[10px] text-slate-400">{profile.academic_title}</div>
-                  </div>
-                  <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-                </button>
-
-                {userMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-64 bg-slate-900 border border-slate-700 rounded-lg shadow-xl py-2 z-50 text-xs">
-                    <div className="px-4 py-2 border-b border-slate-800">
-                      <div className="font-semibold text-slate-200">{profile.full_name}</div>
-                      <div className="text-[11px] text-slate-400">{profile.email}</div>
-                      <div className="mt-1.5">
-                        <RoleBadge role={role} />
-                      </div>
-                    </div>
-                    <Link
-                      href="/profil"
-                      onClick={() => setUserMenuOpen(false)}
-                      className="flex items-center gap-2 px-4 py-2 text-slate-300 hover:bg-slate-800 hover:text-white"
-                    >
-                      <User className="w-3.5 h-3.5" />
-                      <span>Akademik Profilim</span>
-                    </Link>
-                    <Link
-                      href="/calisma-alani"
-                      onClick={() => setUserMenuOpen(false)}
-                      className="flex items-center gap-2 px-4 py-2 text-amber-300 hover:bg-slate-800"
-                    >
-                      <Lock className="w-3.5 h-3.5" />
-                      <span>Kişisel Çalışma Alanım</span>
-                    </Link>
-                    <div className="border-t border-slate-800 my-1"></div>
-                    <button
-                      onClick={() => {
-                        logout();
-                        setUserMenuOpen(false);
-                      }}
-                      className="w-full flex items-center gap-2 px-4 py-2 text-rose-400 hover:bg-slate-800 text-left"
-                    >
-                      <LogOut className="w-3.5 h-3.5" />
-                      <span>Çıkış Yap</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Link
-                  href="/giris"
-                  className="px-3 py-1.5 text-xs font-medium text-slate-200 hover:text-white hover:bg-slate-800 rounded-md transition"
-                >
-                  Giriş Yap
-                </Link>
-                <Link
-                  href="/kayit"
-                  className="px-3 py-1.5 text-xs font-semibold text-white bg-red-800 hover:bg-red-700 rounded-md transition shadow-sm"
-                >
-                  Kayıt Ol
-                </Link>
-              </div>
-            )}
           </div>
-
-          {/* Mobil Menü Butonu */}
-          <div className="lg:hidden flex items-center gap-2">
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-800"
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
-        </div>
+        )}
       </div>
-
-      {/* Mobil Menü İçeriği */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden px-4 pt-2 pb-4 space-y-1 bg-slate-900 border-t border-slate-800">
-          {navLinks.map((link) => {
-            const Icon = link.icon;
-            const isActive = pathname === link.href;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium ${
-                  isActive
-                    ? 'bg-slate-800 text-white font-semibold'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-                }`}
-              >
-                <Icon className="w-4 h-4 text-slate-400" />
-                <span>{link.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      )}
     </header>
   );
 }

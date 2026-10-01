@@ -27,116 +27,123 @@ export default function HomePage() {
   const { profile, role } = useAuth();
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8 sm:space-y-10">
       {/* 1. Karşılama ve Misyon Hero Bölümü */}
-      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 border border-slate-800 p-8 sm:p-10 shadow-xl">
-        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-80 h-80 bg-red-950/20 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="relative z-10 max-w-3xl space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/90 border border-slate-700 text-xs font-medium text-slate-300">
-            <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
-            Ankara Üniversitesi Fen Fakültesi / Enstitüsü
+      <section className="relative overflow-hidden rounded-3xl border border-slate-800/80 bg-slate-950/40 px-6 py-12 sm:px-12 sm:py-16">
+        <div className="absolute -top-32 -right-24 w-[28rem] h-[28rem] rounded-full bg-red-800/25 blur-3xl pointer-events-none"></div>
+        <div className="absolute -bottom-40 left-1/3 w-[24rem] h-[24rem] rounded-full bg-amber-500/5 blur-3xl pointer-events-none"></div>
+        {/* Kafes / Bravais örgüsü dekoru */}
+        <svg
+          aria-hidden="true"
+          className="absolute right-0 top-0 h-full w-1/2 opacity-[0.18] pointer-events-none hidden md:block"
+          viewBox="0 0 400 400"
+          preserveAspectRatio="xMidYMid slice"
+        >
+          <defs>
+            <pattern id="hex" width="40" height="34.64" patternUnits="userSpaceOnUse">
+              <circle cx="0" cy="0" r="2" fill="currentColor" />
+              <circle cx="20" cy="17.32" r="2" fill="currentColor" />
+              <circle cx="40" cy="0" r="2" fill="currentColor" />
+              <circle cx="0" cy="34.64" r="2" fill="currentColor" />
+              <circle cx="40" cy="34.64" r="2" fill="currentColor" />
+              <path d="M0 0 L20 17.32 L40 0 M20 17.32 L0 34.64 M20 17.32 L40 34.64" stroke="currentColor" strokeWidth="0.5" fill="none" />
+            </pattern>
+            <radialGradient id="fade" cx="70%" cy="40%" r="60%">
+              <stop offset="0%" stopColor="white" />
+              <stop offset="100%" stopColor="white" stopOpacity="0" />
+            </radialGradient>
+            <mask id="m">
+              <rect width="400" height="400" fill="url(#fade)" />
+            </mask>
+          </defs>
+          <rect width="400" height="400" fill="url(#hex)" mask="url(#m)" className="text-slate-300" />
+        </svg>
+
+        <div className="relative z-10 max-w-3xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/80 border border-slate-700/70 text-[11px] font-medium text-slate-300 tracking-wide">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+            Ankara Üniversitesi · Fen Fakültesi
           </div>
-          <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-white font-serif leading-tight">
-            Hesaplamalı Yoğun Madde Fiziği (HYMF) Portalına Hoş Geldiniz
+          <h1 className="mt-6 font-serif text-4xl sm:text-6xl leading-[1.05] text-white">
+            Hesaplamalı Yoğun
+            <br />
+            <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-red-300 via-red-200 to-amber-200">
+              Madde Fiziği
+            </span>{' '}
+            Grubu
           </h1>
-          <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-            Araştırma grubumuz; yoğunluk fonksiyoneli teorisi (DFT), moleküler dinamik (MD), 2D manyetik malzemeler, topolojik yalıtkanlar ve perovskit güneş hücrelerinin atomik ölçekli simülasyonları üzerine odaklanmaktadır.
+          <p className="mt-6 text-[15px] sm:text-base text-slate-400 leading-relaxed max-w-2xl">
+            Yoğunluk fonksiyoneli teorisi (DFT), moleküler dinamik, 2D manyetik malzemeler, topolojik yalıtkanlar ve
+            perovskit güneş hücrelerinin atomik ölçekli simülasyonları. Grubun kılavuzları, kaynakları ve ortak
+            çalışma alanı tek yerde.
           </p>
 
-          <div className="pt-2 flex flex-wrap items-center gap-3">
+          <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link
               href="/calisma-alani"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-red-800 hover:bg-red-700 text-white text-xs sm:text-sm font-semibold transition shadow-md hover:shadow-red-900/30"
+              className="group inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-red-700 hover:bg-red-600 text-white text-sm font-medium transition shadow-lg shadow-red-950/50 ring-1 ring-red-500/40"
             >
-              <Lock className="w-4 h-4 text-amber-300" />
-              <span>Kişisel Çalışma Alanım (Gizli Panel)</span>
+              <Lock className="w-4 h-4 text-amber-200" />
+              Çalışma Alanım
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <Link
               href="/kilavuzlar"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium transition border border-slate-700"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-200 text-sm font-medium transition border border-slate-700/80"
             >
               <Wrench className="w-4 h-4 text-slate-400" />
-              <span>TRUBA & VASP Kılavuzları</span>
+              TRUBA & VASP Kılavuzları
             </Link>
             <Link
               href="/duyurular"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-slate-300 text-xs sm:text-sm font-medium transition border border-slate-800"
+              className="inline-flex items-center gap-2 px-4 py-3 text-slate-400 hover:text-white text-sm font-medium transition"
             >
-              <Bell className="w-4 h-4 text-slate-400" />
-              <span>Duyuru Panosu</span>
+              <Bell className="w-4 h-4" />
+              Duyurular
             </Link>
           </div>
         </div>
 
-        {/* Kullanıcı Giriş Durumu Bilgilendirme Kartı */}
-        <div className="mt-8 pt-6 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-400">
+        {/* Kullanıcı Giriş Durumu */}
+        <div className="relative z-10 mt-12 pt-6 border-t border-slate-800/70 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-500">
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <span className="text-slate-400">Aktif Oturum:</span>
-              <span className="text-slate-200 font-semibold">{profile?.full_name}</span>
-            </div>
+            <span>Oturum</span>
+            <span className="text-slate-200 font-medium">{profile?.full_name ?? 'Misafir'}</span>
             <RoleBadge role={role} />
           </div>
-          <div className="text-[11px] text-slate-400 flex items-center gap-1.5 font-mono">
+          <div className="flex items-center gap-1.5 font-mono text-[11px]">
             <Shield className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Rol Tabanlı Erişim Kontrolü (RBAC) Aktif</span>
+            RBAC aktif
           </div>
         </div>
       </section>
 
-      {/* 2. Hızlı Metrikler ve Özet */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-center gap-4">
-          <div className="p-3 rounded-lg bg-slate-800 text-red-400">
-            <Users className="w-6 h-6" />
+      {/* 2. Hızlı Metrikler */}
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-px rounded-2xl border border-slate-800/80 bg-slate-800/80 overflow-hidden">
+        {[
+          { icon: Users, value: INITIAL_PROFILES.length, label: 'Araştırmacı', tint: 'text-red-300' },
+          { icon: Cpu, value: 2, label: 'Aktif TRUBA projesi', tint: 'text-sky-300' },
+          { icon: GraduationCap, value: INITIAL_COURSES.length, label: 'Lisansüstü ders', tint: 'text-emerald-300' },
+          { icon: Send, value: 'Bot', label: 'Telegram bildirimleri', tint: 'text-amber-300' },
+        ].map(({ icon: Icon, value, label, tint }) => (
+          <div key={label} className="p-5 sm:p-6 bg-slate-950/90">
+            <Icon className={`w-4 h-4 ${tint}`} />
+            <div className="mt-3 font-serif text-3xl sm:text-4xl text-white">{value}</div>
+            <div className="mt-1 text-xs text-slate-500">{label}</div>
           </div>
-          <div>
-            <div className="text-2xl font-bold text-white font-mono">{INITIAL_PROFILES.length}</div>
-            <div className="text-xs text-slate-400">Grup Araştırmacısı</div>
-          </div>
-        </div>
-
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-center gap-4">
-          <div className="p-3 rounded-lg bg-slate-800 text-blue-400">
-            <Cpu className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-white font-mono">2</div>
-            <div className="text-xs text-slate-400">Aktif TRUBA Projesi</div>
-          </div>
-        </div>
-
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-center gap-4">
-          <div className="p-3 rounded-lg bg-slate-800 text-emerald-400">
-            <GraduationCap className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-white font-mono">{INITIAL_COURSES.length}</div>
-            <div className="text-xs text-slate-400">Lisansüstü Ders</div>
-          </div>
-        </div>
-
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-center gap-4">
-          <div className="p-3 rounded-lg bg-slate-800 text-amber-400">
-            <Send className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-white font-mono">Telegram</div>
-            <div className="text-xs text-slate-400">Anlık Bot Entegreli</div>
-          </div>
-        </div>
+        ))}
       </section>
 
       {/* 3. Ana Grid: Hızlı Kılavuzlar & Son Duyurular */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Sol Kolon (2 Birim): Hızlı Kılavuzlar ve Resmi Formlar */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Hızlı Kılavuzlar (Manuals) Kartı */}
+          {/* Hızlı Kılavuzlar Kartı */}
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2">
                 <Wrench className="w-5 h-5 text-amber-400" />
-                <h2 className="text-base font-bold text-white font-serif">Hızlı Kılavuzlar (Manuals)</h2>
+                <h2 className="text-xl text-white font-serif">Hızlı Kılavuzlar</h2>
               </div>
               <Link href="/kilavuzlar" className="text-xs text-slate-400 hover:text-white flex items-center gap-1">
                 <span>Tüm Kılavuzlar</span>
@@ -191,7 +198,7 @@ export default function HomePage() {
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-red-400" />
-                <h2 className="text-base font-bold text-white font-serif">
+                <h2 className="text-xl text-white font-serif">
                   Resmi Formlar (Fen Bilimleri Enstitüsü)
                 </h2>
               </div>
@@ -267,7 +274,7 @@ export default function HomePage() {
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2">
                 <Bell className="w-5 h-5 text-red-400" />
-                <h2 className="text-base font-bold text-white font-serif">Duyuru Panosu</h2>
+                <h2 className="text-xl text-white font-serif">Duyuru Panosu</h2>
               </div>
               <Link href="/duyurular" className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1 font-medium">
                 <span>+ Duyuru Yap</span>
@@ -284,15 +291,15 @@ export default function HomePage() {
                     {ann.priority === 'acil' ? (
                       <span className="inline-flex items-center gap-1 text-red-400 font-bold uppercase">
                         <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
-                        🚨 Acil (Telegram)
+                        Acil
                       </span>
                     ) : ann.priority === 'toplanti' ? (
                       <span className="inline-flex items-center gap-1 text-amber-400 font-bold uppercase">
                         <Calendar className="w-3 h-3" />
-                        📅 Toplantı
+                        Toplantı
                       </span>
                     ) : (
-                      <span className="text-slate-400">📢 Bilgilendirme</span>
+                      <span className="text-slate-400">Bilgilendirme</span>
                     )}
                     <span className="text-slate-500 font-mono">
                       {new Date(ann.created_at).toLocaleDateString('tr-TR')}
@@ -314,7 +321,7 @@ export default function HomePage() {
 
             <Link
               href="/duyurular"
-              className="block w-full py-2 text-center text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-750 rounded-lg transition"
+              className="block w-full py-2 text-center text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition"
             >
               Tüm Duyuruları Gör & Gönder
             </Link>
@@ -326,7 +333,7 @@ export default function HomePage() {
       <section className="bg-slate-900 border border-slate-800 rounded-xl p-6 sm:p-8 space-y-6">
         <div className="flex items-center justify-between border-b border-slate-800 pb-4">
           <div>
-            <h2 className="text-lg font-bold text-white font-serif">Grup Üyelerimiz (Vitrin)</h2>
+            <h2 className="text-2xl text-white font-serif">Grup Üyeleri</h2>
             <p className="text-xs text-slate-400">
               Araştırma grubumuzun hocaları, doktora ve yüksek lisans araştırmacıları.
             </p>
