@@ -67,9 +67,7 @@ export default function HomePage() {
           <h1 className="mt-6 font-serif text-4xl sm:text-6xl leading-[1.05] text-white">
             Hesaplamalı Yoğun
             <br />
-            <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-red-300 via-red-200 to-amber-200">
-              Madde Fiziği
-            </span>{' '}
+            Madde Fiziği{' '}
             Grubu
           </h1>
           <p className="mt-6 text-[15px] sm:text-base text-slate-400 leading-relaxed max-w-2xl">
