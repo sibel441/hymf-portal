@@ -23,6 +23,7 @@ import {
 import { useAuth } from '@/context/AuthContext';
 import { RoleBadge } from './RoleBadge';
 import { INITIAL_PROFILES } from '@/lib/mockData';
+import { DEMO_MODU } from '@/lib/demo';
 
 export function Navbar() {
   const pathname = usePathname();
@@ -62,46 +63,48 @@ export function Navbar() {
             </span>
           </div>
 
-          {/* Test/Rol Değiştirici */}
-          <div className="relative shrink-0">
-            <button
-              onClick={() => setRoleSwitcherOpen(!roleSwitcherOpen)}
-              className="flex items-center gap-1.5 px-2 py-0.5 rounded-md text-slate-400 hover:text-slate-200 hover:bg-slate-800/80 transition cursor-pointer"
-              title="Test için kullanıcı rolünü anında değiştirin"
-            >
-              <ShieldCheck className="w-3 h-3 text-amber-400" />
-              <span>
-                Demo rolü: <b className="text-slate-200 font-medium">{profile?.full_name?.split(' ').slice(-1)[0] ?? 'Misafir'}</b>
-              </span>
-              <ChevronDown className="w-3 h-3" />
-            </button>
+          {/* Test/Rol Değiştirici (yalnız demo modunda) */}
+          {DEMO_MODU && (
+            <div className="relative shrink-0">
+              <button
+                onClick={() => setRoleSwitcherOpen(!roleSwitcherOpen)}
+                className="flex items-center gap-1.5 px-2 py-0.5 rounded-md text-slate-400 hover:text-slate-200 hover:bg-slate-800/80 transition cursor-pointer"
+                title="Test için kullanıcı rolünü anında değiştirin"
+              >
+                <ShieldCheck className="w-3 h-3 text-amber-400" />
+                <span>
+                  Demo rolü: <b className="text-slate-200 font-medium">{profile?.full_name?.split(' ').slice(-1)[0] ?? 'Misafir'}</b>
+                </span>
+                <ChevronDown className="w-3 h-3" />
+              </button>
 
-            {roleSwitcherOpen && (
-              <div className="absolute right-0 mt-2 w-72 bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 rounded-xl shadow-2xl shadow-black/50 p-1.5 z-50 text-xs">
-                <div className="px-2.5 py-2 text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
-                  Rol tabanlı erişim testi
+              {roleSwitcherOpen && (
+                <div className="absolute right-0 mt-2 w-72 bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 rounded-xl shadow-2xl shadow-black/50 p-1.5 z-50 text-xs">
+                  <div className="px-2.5 py-2 text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
+                    Rol tabanlı erişim testi
+                  </div>
+                  {INITIAL_PROFILES.map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => {
+                        loginAs(p.id);
+                        setRoleSwitcherOpen(false);
+                      }}
+                      className={`w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between gap-2 hover:bg-slate-800 transition ${
+                        profile?.id === p.id ? 'bg-slate-800/80' : ''
+                      }`}
+                    >
+                      <div className="min-w-0">
+                        <div className="text-slate-100 truncate">{p.full_name}</div>
+                        <div className="text-[10px] text-slate-500 truncate">{p.academic_title}</div>
+                      </div>
+                      <RoleBadge role={p.role} />
+                    </button>
+                  ))}
                 </div>
-                {INITIAL_PROFILES.map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => {
-                      loginAs(p.id);
-                      setRoleSwitcherOpen(false);
-                    }}
-                    className={`w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between gap-2 hover:bg-slate-800 transition ${
-                      profile?.id === p.id ? 'bg-slate-800/80' : ''
-                    }`}
-                  >
-                    <div className="min-w-0">
-                      <div className="text-slate-100 truncate">{p.full_name}</div>
-                      <div className="text-[10px] text-slate-500 truncate">{p.academic_title}</div>
-                    </div>
-                    <RoleBadge role={p.role} />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -196,8 +199,8 @@ export function Navbar() {
                         Kişisel Çalışma Alanım
                       </Link>
                       <button
-                        onClick={() => {
-                          logout();
+                        onClick={async () => {
+                          await logout();
                           setUserMenuOpen(false);
                         }}
                         className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-red-300 hover:bg-red-950/40 text-left"
