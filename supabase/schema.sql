@@ -1,6 +1,7 @@
 -- ==============================================================================
 -- HYMF (Hesaplamalı Yoğun Madde Fiziği) Portalı - Supabase Veritabanı Şeması
--- Rol Tabanlı Erişim Kontrolü (RBAC) ve Güvenlik İlkeleri (RLS)
+-- Sıfırdan kurulum: 1. bu dosya 2. supabase/migrations/20261009000000_calisma_alani.sql 3. supabase/seed_uyeler.sql
+-- Bu dosya tek başına bırakılmamalı. Rol Tabanlı Erişim Kontrolü (RBAC) ve Güvenlik İlkeleri (RLS)
 -- ==============================================================================
 
 -- 1. Kullanıcı Rolleri Enum'u
@@ -26,12 +27,24 @@ create table public.profiles (
   research_topics text[] default '{}',
   scholar_url text,
   orcid text,
-  is_approved boolean default true, -- İlk aşamada doğrudan giriş veya yönetici onayı
+  is_approved boolean default false, -- Migration sonrası allowlist uygulanır
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
 -- RLS: Profiller
 alter table public.profiles enable row level security;
+
+-- Yetki yardımcısı. Policy'ler profiles tablosunu doğrudan sorgulamaz (recursion riski);
+-- security definer fonksiyon RLS'e takılmadan okur.
+create or replace function public.is_hoca_or_yonetici()
+returns boolean
+language sql stable security definer set search_path = ''
+as $$
+  select exists (
+    select 1 from public.profiles
+    where id = (select auth.uid()) and role in ('hoca', 'yonetici') and is_approved
+  );
+$$;
 
 -- Tüm oturum açmış kullanıcılar profilleri listeleyebilir (Üye Vitrini için)
 create policy "Profilleri oturum açan herkes görebilir"
@@ -39,34 +52,60 @@ on public.profiles for select
 to authenticated
 using (true);
 
--- Kullanıcı sadece kendi profilini güncelleyebilir (Hoca ve yöneticiler rolleri de güncelleyebilir)
-create policy "Kullanıcı kendi profilini güncelleyebilir"
+-- Kullanıcı sadece kendi profilini güncelleyebilir
+create policy "Profil güncelleme"
 on public.profiles for update
 to authenticated
-using (
-  auth.uid() = id or 
-  exists (select 1 from public.profiles where id = auth.uid() and role in ('hoca', 'yonetici'))
-);
+using (id = auth.uid()) with check (id = auth.uid());
 
 -- Yeni üye olduğunda otomatik profil oluşturan Trigger
 create or replace function public.handle_new_user()
 returns trigger as $$
+declare
+  v_full_name text;
+  v_department text;
 begin
-  insert into public.profiles (id, email, full_name, role, academic_title)
+  v_full_name := left(coalesce(nullif(trim(new.raw_user_meta_data->>'full_name'),''), split_part(new.email,'@',1)), 120);
+  v_department := left(nullif(new.raw_user_meta_data->>'department',''), 120);
+
+  insert into public.profiles (id, email, full_name, role, department, is_approved)
   values (
     new.id,
-    new.email,
-    coalesce(new.raw_user_meta_data->>'full_name', split_part(new.email, '@', 1)),
-    coalesce((new.raw_user_meta_data->>'role')::user_role, 'arastirmaci'::user_role),
-    coalesce(new.raw_user_meta_data->>'academic_title', 'Araştırmacı')
+    lower(new.email),
+    v_full_name,
+    'arastirmaci'::public.user_role,
+    v_department,
+    false
   );
   return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = '';
 
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
+
+-- Kullanıcı kendi rolünü, onayını veya e-postasını değiştiremez. (SQL Editor'de auth.uid() boştur.)
+-- Migration bu fonksiyonu aynı adla kadro/yetki kurallarıyla değiştirir.
+create or replace function public.profiles_guard()
+returns trigger
+language plpgsql security definer set search_path = ''
+as $$
+begin
+  if (select auth.uid()) is not null and (
+       new.role is distinct from old.role
+       or new.is_approved is distinct from old.is_approved
+       or new.email is distinct from old.email
+       or new.id is distinct from old.id) then
+    raise exception 'Bu alanları değiştiremezsiniz.' using errcode = '42501';
+  end if;
+  return new;
+end;
+$$;
+
+create trigger profiles_guard_trigger
+  before update on public.profiles
+  for each row execute procedure public.profiles_guard();
 
 -- ------------------------------------------------------------------------------
 -- DUYURULAR TABLOSU (Telegram Grubu Entegrasyonlu)
@@ -99,7 +138,7 @@ on public.announcements for delete
 to authenticated
 using (
   auth.uid() = author_id or
-  exists (select 1 from public.profiles where id = auth.uid() and role in ('hoca', 'yonetici'))
+  public.is_hoca_or_yonetici()
 );
 
 -- ------------------------------------------------------------------------------
@@ -136,7 +175,7 @@ on public.resources for delete
 to authenticated
 using (
   auth.uid() = uploader_id or
-  exists (select 1 from public.profiles where id = auth.uid() and role in ('hoca', 'yonetici'))
+  public.is_hoca_or_yonetici()
 );
 
 -- ------------------------------------------------------------------------------
@@ -174,14 +213,14 @@ create policy "Hoca ve yöneticiler ders ekleyebilir"
 on public.courses for insert
 to authenticated
 with check (
-  exists (select 1 from public.profiles where id = auth.uid() and role in ('hoca', 'yonetici'))
+  public.is_hoca_or_yonetici()
 );
 
 create policy "Hoca ve yöneticiler ders materyali ekleyebilir"
 on public.course_materials for insert
 to authenticated
 with check (
-  exists (select 1 from public.profiles where id = auth.uid() and role in ('hoca', 'yonetici'))
+  public.is_hoca_or_yonetici()
 );
 
 -- ------------------------------------------------------------------------------
@@ -248,7 +287,7 @@ on public.student_workspaces for select
 to authenticated
 using (
   student_id = auth.uid() or
-  exists (select 1 from public.profiles where id = auth.uid() and role in ('hoca', 'yonetici'))
+  public.is_hoca_or_yonetici()
 );
 
 create policy "Workspace düzenleme yetkisi (Update)"
@@ -256,7 +295,7 @@ on public.student_workspaces for update
 to authenticated
 using (
   student_id = auth.uid() or
-  exists (select 1 from public.profiles where id = auth.uid() and role in ('hoca', 'yonetici'))
+  public.is_hoca_or_yonetici()
 );
 
 create policy "Workspace dosyalarını sadece yetkili ve öğrenci görebilir"
@@ -267,7 +306,7 @@ using (
     select 1 from public.student_workspaces w
     where w.id = workspace_files.workspace_id and (
       w.student_id = auth.uid() or
-      exists (select 1 from public.profiles where id = auth.uid() and role in ('hoca', 'yonetici'))
+      public.is_hoca_or_yonetici()
     )
   )
 );
@@ -280,7 +319,7 @@ with check (
     select 1 from public.student_workspaces w
     where w.id = workspace_files.workspace_id and (
       w.student_id = auth.uid() or
-      exists (select 1 from public.profiles where id = auth.uid() and role in ('hoca', 'yonetici'))
+      public.is_hoca_or_yonetici()
     )
   )
 );
@@ -293,12 +332,7 @@ using (
     select 1 from public.student_workspaces w
     where w.id = workspace_logs.workspace_id and (
       w.student_id = auth.uid() or
-      exists (select 1 from public.profiles where id = auth.uid() and role in ('hoca', 'yonetici'))
+      public.is_hoca_or_yonetici()
     )
   )
 );
-
-create policy "Workspace log ekleme yetkisi"
-on public.workspace_logs for insert
-to authenticated
-with check (auth.uid() = actor_id);
