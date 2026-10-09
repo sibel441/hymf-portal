@@ -2,15 +2,15 @@
 
 import React, { useState } from 'react';
 import {
-  AlertCircle,
-  CheckCircle,
   Download,
   ExternalLink,
-  FileCheck,
-  FileText,
-  HelpCircle,
-  Link as LinkIcon,
 } from 'lucide-react';
+import {
+  SayfaBasligi,
+  Panel,
+  Button,
+  Uyari,
+} from '@/components/ui';
 
 export default function FormsPage() {
   const [selectedDept, setSelectedDept] = useState<'fizik' | 'fizik_muh'>('fizik');
@@ -95,96 +95,80 @@ export default function FormsPage() {
 
   return (
     <div className="space-y-8">
-      {/* Başlık ve Enstitü Bilgilendirmesi */}
-      <div className="border-b border-slate-800 pb-5">
-        <div className="flex items-center gap-2 text-xs font-mono text-red-400 mb-1">
-          <FileText className="w-4 h-4" />
-          <span>ANKARA ÜNİVERSİTESİ FEN BİLİMLERİ ENSTİTÜSÜ</span>
-        </div>
-        <h1 className="text-2xl sm:text-3xl font-bold font-serif text-white">
-          Resmi Formlar ve Belgeler
-        </h1>
-        <p className="text-xs sm:text-sm text-slate-400 mt-2 max-w-3xl">
-          Karmaşayı önlemek amacıyla Enstitümüzün <strong>Fizik</strong> ve <strong>Fizik Mühendisliği</strong> Anabilim Dallarına ait lisansüstü resmi formları, tez süreçleri ve teslim yönergeleri kategorize edilmiştir.
-        </p>
-      </div>
+      <SayfaBasligi
+        baslik="Resmi formlar ve belgeler"
+        aciklama="Ankara Üniversitesi Fen Bilimleri Enstitüsü Fizik ve Fizik Mühendisliği Anabilim Dallarının lisansüstü resmi formları, tez süreçleri ve teslim yönergeleri."
+      />
 
       {/* Anabilim Dalı Seçim Butonları */}
       <div className="flex gap-3">
-        <button
+        <Button
+          variant={selectedDept === 'fizik' ? 'primary' : 'secondary'}
+          size="sm"
           onClick={() => setSelectedDept('fizik')}
-          className={`px-5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-2 ${
-            selectedDept === 'fizik'
-              ? 'bg-red-800 text-white shadow-md'
-              : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
-          }`}
+          className="justify-start"
         >
-          <span>Fizik Anabilim Dalı</span>
-          <span className="px-2 py-0.5 rounded bg-slate-950/60 text-[10px] text-slate-300 font-mono">
-            {fizikFormlari.length} Belge
+          <span>Fizik anabilim dalı</span>
+          <span className="ml-auto px-2 py-0.5 rounded text-xs font-mono bg-sunken text-ink-3">
+            {fizikFormlari.length} belge
           </span>
-        </button>
+        </Button>
 
-        <button
+        <Button
+          variant={selectedDept === 'fizik_muh' ? 'primary' : 'secondary'}
+          size="sm"
           onClick={() => setSelectedDept('fizik_muh')}
-          className={`px-5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-2 ${
-            selectedDept === 'fizik_muh'
-              ? 'bg-red-800 text-white shadow-md'
-              : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
-          }`}
+          className="justify-start"
         >
-          <span>Fizik Mühendisliği Anabilim Dalı</span>
-          <span className="px-2 py-0.5 rounded bg-slate-950/60 text-[10px] text-slate-300 font-mono">
-            {muhendislikFormlari.length} Belge
+          <span>Fizik mühendisliği anabilim dalı</span>
+          <span className="ml-auto px-2 py-0.5 rounded text-xs font-mono bg-sunken text-ink-3">
+            {muhendislikFormlari.length} belge
           </span>
-        </button>
+        </Button>
       </div>
 
       {/* Form Listesi */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {(selectedDept === 'fizik' ? fizikFormlari : muhendislikFormlari).map((item) => (
-          <div
+          <Panel
             key={item.id}
-            className="p-5 rounded-xl bg-slate-900 border border-slate-800/90 hover:border-slate-700 transition space-y-3 flex flex-col justify-between"
+            className="flex flex-col justify-between space-y-3"
           >
             <div>
-              <div className="flex items-center justify-between text-[11px] mb-2">
-                <span className="font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-semibold">
+              <div className="flex items-center justify-between text-xs mb-2">
+                <span className="font-mono px-2 py-0.5 rounded bg-sunken text-ink font-semibold">
                   {item.code}
                 </span>
-                <span className="text-slate-400 font-mono">{item.format}</span>
+                <span className="text-ink-3 font-mono">{item.format}</span>
               </div>
-              <h3 className="text-sm font-bold text-white font-serif leading-snug">
+              <h3 className="text-base font-semibold text-ink leading-snug">
                 {item.title}
               </h3>
-              <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+              <p className="text-sm text-ink-2 mt-2 leading-relaxed">
                 {item.description}
               </p>
             </div>
 
-            <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between">
+            <div className="pt-3 border-t border-line flex items-center justify-between">
               <a
                 href={item.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-red-400 hover:text-red-300 transition"
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-link hover:opacity-80 transition"
               >
-                <Download className="w-3.5 h-3.5" />
-                <span>Formu İndir / Enstitü Sayfası</span>
-                <ExternalLink className="w-3 h-3 text-slate-500" />
+                <Download className="w-4 h-4" />
+                <span>Formu indir</span>
+                <ExternalLink className="w-3.5 h-3.5 text-ink-3" />
               </a>
             </div>
-          </div>
+          </Panel>
         ))}
       </div>
 
       {/* Önemli Hatırlatma Notu */}
-      <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 flex items-start gap-3 text-xs text-slate-400">
-        <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-        <div className="leading-relaxed">
-          <strong className="text-slate-200">Enstitü Teslim Standartları:</strong> Tez savunma sınavı ve tez izleme raporları teslim edilirken danışman hocanın ıslak veya e-imzası zorunludur. Turnitin intihal raporu tek kaynak benzerliği %5'i, toplam benzerlik %20'yi aşmamalıdır.
-        </div>
-      </div>
+      <Uyari tone="uyari">
+        <strong>Enstitü teslim standartları.</strong> Tez savunma sınavı ve tez izleme raporları teslim edilirken danışman hocanın ıslak veya e-imzası zorunludur. Turnitin intihal raporu tek kaynak benzerliği %5&apos;i, toplam benzerlik %20&apos;yi aşmamalıdır.
+      </Uyari>
     </div>
   );
 }

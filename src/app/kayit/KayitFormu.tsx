@@ -109,7 +109,7 @@ export function KayitFormu() {
           />
         </Alan>
 
-        <Alan etiket="E-posta Adresi" htmlFor="email">
+        <Alan etiket="E-posta adresi" htmlFor="email">
           <input
             id="email"
             type="email"
@@ -163,7 +163,7 @@ export function KayitFormu() {
         </Button>
       </form>
 
-      <div className="text-center text-sm text-ink-2">
+      <div className="text-sm text-ink-2">
         Zaten hesabınız var mı?{' '}
         <Link href="/giris" className="text-link hover:underline font-medium">
           Giriş yapın

@@ -2,12 +2,10 @@ import { KayitFormu } from './KayitFormu';
 
 export default function KayitPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-paper px-4 py-12">
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <h1 className="font-serif text-3xl mb-2">Yeni Araştırmacı Kaydı</h1>
-          <p className="text-ink-3 text-sm">Portala katılmak için kayıt olun</p>
-        </div>
+    <div className="mx-auto max-w-sm py-4 sm:py-10">
+      <h1 className="font-serif text-2xl text-ink sm:text-4xl">Kayıt ol</h1>
+      <p className="mt-2 text-base text-ink-2">Davet listesindeki adresler doğrulamadan sonra otomatik açılır; diğer hesapları bir yönetici onaylar.</p>
+      <div className="mt-8">
         <KayitFormu />
       </div>
     </div>

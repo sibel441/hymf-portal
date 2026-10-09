@@ -1,268 +1,238 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import {
-  Bell,
-  BookOpen,
-  Calendar,
-  ChevronDown,
-  FileText,
-  GraduationCap,
-  Home,
-  Lock,
-  LogOut,
-  Menu,
-  ShieldCheck,
-  User,
-  Users,
-  Wrench,
-  X,
-} from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Menu, X } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { RoleBadge } from './RoleBadge';
 import { INITIAL_PROFILES } from '@/lib/mockData';
 import { DEMO_MODU } from '@/lib/demo';
+import { isMember } from '@/lib/yetki';
+import { KADRO_ETIKETI } from '@/lib/etiketler';
+import { cn } from '@/lib/cn';
+import { BasHarfAvatar, YetkiRozeti, buttonClass } from '@/components/ui';
+
+const genelBaglantilar = [
+  { href: '/kilavuzlar', etiket: 'Kılavuzlar' },
+  { href: '/formlar', etiket: 'Formlar' },
+  { href: '/duyurular', etiket: 'Duyurular' },
+  { href: '/kaynaklar', etiket: 'Kaynaklar' },
+  { href: '/dersler', etiket: 'Dersler' },
+  { href: '/toplantilar', etiket: 'Toplantılar' },
+  { href: '/uyeler', etiket: 'Üyeler' },
+];
+
+function aktifMi(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(href + '/');
+}
+
+/** Dışarı tıklanınca veya Escape'e basılınca kapanan açılır menü durumu. */
+function useAcilir() {
+  const [acik, setAcik] = useState(false);
+  const kap = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!acik) return;
+    const disTik = (e: MouseEvent) => {
+      if (kap.current && !kap.current.contains(e.target as Node)) setAcik(false);
+    };
+    const tus = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setAcik(false);
+    };
+    document.addEventListener('mousedown', disTik);
+    document.addEventListener('keydown', tus);
+    return () => {
+      document.removeEventListener('mousedown', disTik);
+      document.removeEventListener('keydown', tus);
+    };
+  }, [acik]);
+  return { acik, setAcik, kap };
+}
 
 export function Navbar() {
   const pathname = usePathname();
-  const { profile, role, loginAs, logout } = useAuth();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [roleSwitcherOpen, setRoleSwitcherOpen] = useState(false);
+  const router = useRouter();
+  const { profile, isLoading, isAdmin, isHoca, loginAs, logout } = useAuth();
+  const [mobilAcik, setMobilAcik] = useState(false);
+  const { acik: kullaniciAcik, setAcik: setKullaniciAcik, kap: kullaniciKap } = useAcilir();
+  const { acik: demoAcik, setAcik: setDemoAcik, kap: demoKap } = useAcilir();
 
-  const navLinks = [
-    { href: '/', label: 'Ana Sayfa', icon: Home },
-    { href: '/kilavuzlar', label: 'Kılavuzlar', icon: Wrench },
-    { href: '/formlar', label: 'Formlar', icon: FileText },
-    { href: '/uyeler', label: 'Üyeler', icon: Users },
-    { href: '/duyurular', label: 'Duyurular', icon: Bell },
-    { href: '/kaynaklar', label: 'Kaynaklar', icon: BookOpen },
-    { href: '/dersler', label: 'Dersler', icon: GraduationCap },
-    { href: '/toplantilar', label: 'Toplantılar', icon: Calendar },
-  ];
+  // Sayfa değişince menüler kapanır (render sırasında, önceki yolla karşılaştırarak).
+  const [oncekiYol, setOncekiYol] = useState(pathname);
+  if (pathname !== oncekiYol) {
+    setOncekiYol(pathname);
+    setMobilAcik(false);
+    setKullaniciAcik(false);
+  }
 
-  const initials = profile?.full_name
-    .split(' ')
-    .filter((n) => !n.endsWith('.'))
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join('');
+  const uye = isMember(profile);
+  const ozelBaglantilar = uye
+    ? [
+        { href: '/calisma-alani', etiket: isHoca ? 'Öğrencilerim' : 'Çalışma alanım' },
+        ...(isAdmin ? [{ href: '/yonetim', etiket: 'Yönetim' }] : []),
+      ]
+    : [];
+
+  async function cikis() {
+    setKullaniciAcik(false);
+    await logout();
+    router.replace('/');
+  }
+
+  const baglantiSinifi = (href: string) =>
+    cn(
+      '-mb-px flex h-14 items-center border-b-2 px-2.5 text-sm transition-colors',
+      aktifMi(pathname, href) ? 'border-ink font-medium text-ink' : 'border-transparent text-ink-2 hover:text-ink'
+    );
 
   return (
-    <header className="sticky top-0 z-50 text-slate-100">
-      {/* Üst Üniversite Şeridi */}
-      <div className="bg-slate-950 border-b border-slate-800/70 text-[11px]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-8 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <span className="font-semibold tracking-[0.14em] text-slate-300">ANKARA ÜNİVERSİTESİ</span>
-            <span className="hidden sm:inline w-px h-3 bg-slate-700"></span>
-            <span className="hidden sm:inline text-slate-500 truncate">
-              Fen Fakültesi · Hesaplamalı Yoğun Madde Fiziği
-            </span>
+    <header className="sticky top-0 z-40 border-b border-line bg-surface">
+      {DEMO_MODU && (
+        <div className="border-b border-line bg-warn-soft text-sm text-warn">
+          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-1.5 sm:px-6">
+            <span>Demo modu açık: bu oturumdaki kişiler ve veriler örnektir.</span>
+            <div className="relative" ref={demoKap}>
+              <button
+                type="button"
+                onClick={() => setDemoAcik(!demoAcik)}
+                aria-expanded={demoAcik}
+                className="underline underline-offset-2"
+              >
+                Örnek kişi seç
+              </button>
+              {demoAcik && (
+                <ul className="absolute right-0 z-50 mt-2 w-64 rounded-md border border-line bg-surface p-1 text-ink shadow-lg">
+                  {INITIAL_PROFILES.map((p) => (
+                    <li key={p.id}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          loginAs(p.id);
+                          setDemoAcik(false);
+                        }}
+                        className={cn(
+                          'flex w-full flex-col items-start rounded px-3 py-2 text-left hover:bg-sunken',
+                          profile?.id === p.id && 'bg-sunken'
+                        )}
+                      >
+                        <span className="text-sm">{p.full_name}</span>
+                        <span className="text-sm text-ink-3">{p.kadro ? KADRO_ETIKETI[p.kadro] : ''}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 sm:px-6">
+        <Link href="/" className="flex shrink-0 items-baseline gap-2 text-ink">
+          <span className="font-serif text-2xl leading-none" aria-hidden="true">
+            Ψ
+          </span>
+          <span className="font-serif text-lg leading-none">HYMF Portal</span>
+        </Link>
+
+        <nav aria-label="Ana menü" className="hidden min-w-0 flex-1 items-center lg:flex">
+          {genelBaglantilar.map((b) => (
+            <Link key={b.href} href={b.href} className={baglantiSinifi(b.href)} aria-current={aktifMi(pathname, b.href) ? 'page' : undefined}>
+              {b.etiket}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="ml-auto flex items-center gap-1 lg:ml-0">
+          <div className="hidden items-center lg:flex">
+            {ozelBaglantilar.map((b) => (
+              <Link key={b.href} href={b.href} className={baglantiSinifi(b.href)} aria-current={aktifMi(pathname, b.href) ? 'page' : undefined}>
+                {b.etiket}
+              </Link>
+            ))}
           </div>
 
-          {/* Test/Rol Değiştirici (yalnız demo modunda) */}
-          {DEMO_MODU && (
-            <div className="relative shrink-0">
+          {isLoading ? (
+            <span className="size-9" aria-hidden="true" />
+          ) : profile ? (
+            <div className="relative ml-2" ref={kullaniciKap}>
               <button
-                onClick={() => setRoleSwitcherOpen(!roleSwitcherOpen)}
-                className="flex items-center gap-1.5 px-2 py-0.5 rounded-md text-slate-400 hover:text-slate-200 hover:bg-slate-800/80 transition cursor-pointer"
-                title="Test için kullanıcı rolünü anında değiştirin"
+                type="button"
+                onClick={() => setKullaniciAcik(!kullaniciAcik)}
+                aria-expanded={kullaniciAcik}
+                aria-haspopup="menu"
+                aria-label="Hesap menüsü"
+                className="rounded-full"
               >
-                <ShieldCheck className="w-3 h-3 text-amber-400" />
-                <span>
-                  Demo rolü: <b className="text-slate-200 font-medium">{profile?.full_name?.split(' ').slice(-1)[0] ?? 'Misafir'}</b>
-                </span>
-                <ChevronDown className="w-3 h-3" />
+                <BasHarfAvatar ad={profile.full_name} size="md" />
               </button>
-
-              {roleSwitcherOpen && (
-                <div className="absolute right-0 mt-2 w-72 bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 rounded-xl shadow-2xl shadow-black/50 p-1.5 z-50 text-xs">
-                  <div className="px-2.5 py-2 text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
-                    Rol tabanlı erişim testi
+              {kullaniciAcik && (
+                <div role="menu" className="absolute right-0 z-50 mt-2 w-64 rounded-md border border-line bg-surface p-1 shadow-lg">
+                  <div className="space-y-1 px-3 py-2">
+                    <p className="text-sm font-medium text-ink">{profile.full_name}</p>
+                    <p className="truncate text-sm text-ink-3">{profile.email}</p>
+                    <YetkiRozeti yetki={profile.yetki} />
                   </div>
-                  {INITIAL_PROFILES.map((p) => (
-                    <button
-                      key={p.id}
-                      onClick={() => {
-                        loginAs(p.id);
-                        setRoleSwitcherOpen(false);
-                      }}
-                      className={`w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between gap-2 hover:bg-slate-800 transition ${
-                        profile?.id === p.id ? 'bg-slate-800/80' : ''
-                      }`}
-                    >
-                      <div className="min-w-0">
-                        <div className="text-slate-100 truncate">{p.full_name}</div>
-                        <div className="text-[10px] text-slate-500 truncate">{p.academic_title}</div>
-                      </div>
-                      <RoleBadge role={p.role} />
-                    </button>
-                  ))}
+                  <div className="my-1 border-t border-line" />
+                  <Link role="menuitem" href="/profil" className="block rounded px-3 py-2 text-sm text-ink-2 hover:bg-sunken hover:text-ink">
+                    Profilim
+                  </Link>
+                  <button role="menuitem" type="button" onClick={cikis} className="block w-full rounded px-3 py-2 text-left text-sm text-ink-2 hover:bg-sunken hover:text-ink">
+                    Çıkış yap
+                  </button>
                 </div>
               )}
+            </div>
+          ) : (
+            <div className="flex items-center gap-1">
+              <Link href="/giris" className={buttonClass({ variant: 'ghost', size: 'sm' })}>
+                Giriş
+              </Link>
+              <Link href="/kayit" className={buttonClass({ variant: 'secondary', size: 'sm', className: 'hidden sm:inline-flex' })}>
+                Kayıt ol
+              </Link>
             </div>
           )}
+
+          <button
+            type="button"
+            onClick={() => setMobilAcik(!mobilAcik)}
+            aria-expanded={mobilAcik}
+            aria-controls="mobil-menu"
+            aria-label={mobilAcik ? 'Menüyü kapat' : 'Menüyü aç'}
+            className="ml-1 rounded-md p-2 text-ink-2 hover:bg-sunken hover:text-ink lg:hidden"
+          >
+            {mobilAcik ? <X className="size-5" aria-hidden="true" /> : <Menu className="size-5" aria-hidden="true" />}
+          </button>
         </div>
       </div>
 
-      {/* Ana Navbar */}
-      <div className="bg-slate-950/70 backdrop-blur-xl border-b border-slate-800/70">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-16 gap-6">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 group shrink-0">
-              <div className="relative w-9 h-9 rounded-lg bg-gradient-to-br from-red-700 to-red-950 ring-1 ring-red-500/30 flex items-center justify-center font-serif text-xl text-white shadow-lg shadow-red-950/50">
-                Ψ
-              </div>
-              <div className="leading-tight">
-                <span className="block font-serif text-[19px] text-white tracking-tight">
-                  HYMF <span className="italic text-slate-400">Portal</span>
-                </span>
-                <span className="block text-[10px] font-mono text-slate-500">hymf.ankara.edu.tr</span>
-              </div>
-            </Link>
-
-            {/* Masaüstü Menü */}
-            <nav className="hidden xl:flex items-center gap-0.5">
-              {navLinks.map((link) => {
-                const isActive = pathname === link.href;
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`relative px-3 py-2 text-[13px] rounded-md transition-colors ${
-                      isActive ? 'text-white' : 'text-slate-400 hover:text-slate-100'
-                    }`}
-                  >
-                    {link.label}
-                    {isActive && (
-                      <span className="absolute left-3 right-3 -bottom-[13px] h-[2px] rounded-full bg-gradient-to-r from-red-500 to-amber-400"></span>
-                    )}
-                  </Link>
-                );
-              })}
-            </nav>
-
-            {/* Sağ taraf */}
-            <div className="hidden xl:flex items-center gap-2 shrink-0">
-              <Link
-                href="/calisma-alani"
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] border transition ${
-                  pathname === '/calisma-alani'
-                    ? 'bg-amber-500/15 text-amber-200 border-amber-500/40'
-                    : 'text-amber-300/90 border-amber-500/25 hover:bg-amber-500/10'
-                }`}
-              >
-                <Lock className="w-3.5 h-3.5" />
-                Çalışma Alanı
-              </Link>
-
-              {profile ? (
-                <div className="relative">
-                  <button
-                    onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="flex items-center gap-1.5 p-1 pr-2 rounded-full hover:bg-slate-800/80 transition cursor-pointer"
-                    aria-label="Kullanıcı menüsü"
-                  >
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-600 to-slate-800 ring-1 ring-slate-600 flex items-center justify-center text-[11px] font-semibold text-white">
-                      {initials}
-                    </div>
-                    <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
-                  </button>
-
-                  {userMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-64 bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 rounded-xl shadow-2xl shadow-black/50 p-1.5 z-50 text-[13px]">
-                      <div className="px-3 py-2.5 mb-1 border-b border-slate-800">
-                        <div className="font-medium text-slate-100">{profile.full_name}</div>
-                        <div className="text-[11px] text-slate-500">{profile.email}</div>
-                        <div className="mt-2">
-                          <RoleBadge role={role} />
-                        </div>
-                      </div>
-                      <Link
-                        href="/profil"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white"
-                      >
-                        <User className="w-4 h-4 text-slate-500" />
-                        Akademik Profilim
-                      </Link>
-                      <Link
-                        href="/calisma-alani"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white"
-                      >
-                        <Lock className="w-4 h-4 text-amber-400" />
-                        Kişisel Çalışma Alanım
-                      </Link>
-                      <button
-                        onClick={async () => {
-                          await logout();
-                          setUserMenuOpen(false);
-                        }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-red-300 hover:bg-red-950/40 text-left"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        Çıkış Yap
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="flex items-center gap-1">
-                  <Link
-                    href="/giris"
-                    className="px-3 py-1.5 text-[13px] text-slate-300 hover:text-white rounded-lg transition"
-                  >
-                    Giriş
-                  </Link>
-                  <Link
-                    href="/kayit"
-                    className="px-3.5 py-1.5 text-[13px] font-medium text-white bg-red-700 hover:bg-red-600 rounded-lg transition shadow-md shadow-red-950/40"
-                  >
-                    Kayıt Ol
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            {/* Mobil Menü Butonu */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="xl:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
-              aria-label="Menü"
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobil Menü İçeriği */}
-        {mobileMenuOpen && (
-          <div className="xl:hidden px-4 pt-2 pb-4 border-t border-slate-800/70 grid grid-cols-2 gap-1">
-            {[...navLinks, { href: '/calisma-alani', label: 'Çalışma Alanı', icon: Lock }, { href: '/profil', label: 'Profilim', icon: User }].map((link) => {
-              const Icon = link.icon;
-              const isActive = pathname === link.href;
-              return (
+      {mobilAcik && (
+        <nav id="mobil-menu" aria-label="Ana menü" className="border-t border-line lg:hidden">
+          <ul className="mx-auto max-w-6xl px-2 py-2">
+            {[...ozelBaglantilar, ...genelBaglantilar].map((b) => (
+              <li key={b.href}>
                 <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm ${
-                    isActive ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800/70 hover:text-white'
-                  }`}
+                  href={b.href}
+                  aria-current={aktifMi(pathname, b.href) ? 'page' : undefined}
+                  className={cn(
+                    'block rounded-md px-3 py-2.5 text-base',
+                    aktifMi(pathname, b.href) ? 'bg-sunken font-medium text-ink' : 'text-ink-2 hover:bg-sunken hover:text-ink'
+                  )}
                 >
-                  <Icon className={`w-4 h-4 ${link.href === '/calisma-alani' ? 'text-amber-400' : 'text-slate-500'}`} />
-                  {link.label}
+                  {b.etiket}
                 </Link>
-              );
-            })}
-          </div>
-        )}
-      </div>
+              </li>
+            ))}
+            {!profile && !isLoading && (
+              <li>
+                <Link href="/kayit" className="block rounded-md px-3 py-2.5 text-base text-ink-2 hover:bg-sunken hover:text-ink sm:hidden">
+                  Kayıt ol
+                </Link>
+              </li>
+            )}
+          </ul>
+        </nav>
+      )}
     </header>
   );
 }

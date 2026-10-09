@@ -2,22 +2,23 @@
 
 import React, { useState } from 'react';
 import {
-  AlertCircle,
-  Bell,
-  Calendar,
   CheckCircle2,
-  Clock,
-  HelpCircle,
   Plus,
   Send,
-  Share2,
   Trash2,
   User,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { INITIAL_ANNOUNCEMENTS } from '@/lib/mockData';
 import { Announcement, AnnouncementPriority } from '@/types/database';
-import { RoleBadge } from '@/components/RoleBadge';
+import {
+  SayfaBasligi,
+  OrnekVeriNotu,
+  Panel,
+  Button,
+  Rozet,
+  YetkiRozeti,
+} from '@/components/ui';
 
 export default function AnnouncementsPage() {
   const { profile, role } = useAuth();
@@ -114,33 +115,26 @@ export default function AnnouncementsPage() {
 
   return (
     <div className="space-y-8">
-      {/* Üst Başlık ve Aksiyon */}
-      <div className="border-b border-slate-800 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-mono text-red-400 mb-1">
-            <Bell className="w-4 h-4" />
-            <span>TOPLULUK AKIŞI VE BİLDİRİMLER</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold font-serif text-white">
-            Duyuru Panosu & Telegram Bildirimleri
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl">
-            Tüm grup üyelerinin ortak akışı. Acil ve toplantı duyuruları doğrudan HYMF Telegram grubuna düşer.
-          </p>
-        </div>
+      <SayfaBasligi
+        baslik="Duyurular"
+        aciklama="Tüm grup üyelerinin ortak akışı. Acil ve toplantı duyuruları doğrudan Telegram grubuna iletilir."
+        eylemler={
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <Plus className="w-4 h-4" />
+            <span>Duyuru ekle</span>
+          </Button>
+        }
+      />
 
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-red-800 hover:bg-red-700 text-white text-xs font-bold transition shadow-md cursor-pointer shrink-0"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Yeni Duyuru Yap</span>
-        </button>
-      </div>
+      <OrnekVeriNotu />
 
       {/* Geri Bildirim Bildirimi */}
       {feedbackMessage && (
-        <div className="p-4 rounded-xl bg-emerald-950/60 border border-emerald-800 text-emerald-300 text-xs flex items-center gap-3">
+        <div className="p-4 rounded-lg bg-ok-soft border border-ok text-ok text-sm flex items-center gap-3">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{feedbackMessage}</span>
         </div>
@@ -149,19 +143,19 @@ export default function AnnouncementsPage() {
       {/* Öncelik Filtreleme Butonları */}
       <div className="flex flex-wrap gap-2">
         {[
-          { id: 'all', label: 'Tüm Duyurular' },
-          { id: 'acil', label: '🚨 Acil' },
-          { id: 'toplanti', label: '📅 Toplantılar' },
-          { id: 'soru_yardim', label: '💬 Soru / Yardım' },
-          { id: 'kaynak_paylasimi', label: '📚 Kaynak Paylaşımı' },
+          { id: 'all', label: 'Tüm duyurular' },
+          { id: 'acil', label: 'Acil' },
+          { id: 'toplanti', label: 'Toplantılar' },
+          { id: 'soru_yardim', label: 'Soru ve yardım' },
+          { id: 'kaynak_paylasimi', label: 'Kaynak paylaşımı' },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setFilterPriority(tab.id)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
+            className={`px-3 py-1.5 rounded-md text-sm font-medium transition cursor-pointer ${
               filterPriority === tab.id
-                ? 'bg-red-800 text-white shadow-sm'
-                : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+                ? 'bg-primary text-on-primary'
+                : 'bg-sunken text-ink-2 hover:bg-sunken border border-line'
             }`}
           >
             {tab.label}
@@ -172,56 +166,45 @@ export default function AnnouncementsPage() {
       {/* Duyuru Kartları */}
       <div className="space-y-4">
         {filtered.map((ann) => (
-          <div
-            key={ann.id}
-            className="p-6 rounded-xl bg-slate-900 border border-slate-800 space-y-4 transition hover:border-slate-700"
-          >
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
-              <div className="flex items-center gap-3">
-                {ann.priority === 'acil' && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-950 text-red-400 border border-red-800 animate-pulse">
-                    🚨 Acil Duyuru (Telegram Anlık)
-                  </span>
-                )}
-                {ann.priority === 'toplanti' && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-950 text-amber-300 border border-amber-800">
-                    <Calendar className="w-3 h-3" />
-                    📅 Toplantı (Telegram Anlık)
-                  </span>
-                )}
-                {ann.priority === 'soru_yardim' && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
-                    <HelpCircle className="w-3 h-3" />
-                    💬 Soru & Destek (Portal)
-                  </span>
-                )}
-                {ann.priority === 'kaynak_paylasimi' && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
-                    <Share2 className="w-3 h-3" />
-                    📚 Kaynak Paylaşımı
-                  </span>
-                )}
+          <Panel key={ann.id} className="space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Rozet
+                  tone={
+                    ann.priority === 'acil'
+                      ? 'uyari'
+                      : ann.priority === 'toplanti'
+                        ? 'bilgi'
+                        : ann.priority === 'soru_yardim'
+                          ? 'notr'
+                          : 'basari'
+                  }
+                >
+                  {ann.priority === 'acil'
+                    ? 'Acil'
+                    : ann.priority === 'toplanti'
+                      ? 'Toplantı'
+                      : ann.priority === 'soru_yardim'
+                        ? 'Soru ve yardım'
+                        : 'Kaynak paylaşımı'}
+                </Rozet>
 
                 {ann.telegram_sent && (
-                  <span className="text-[11px] text-emerald-400 font-mono flex items-center gap-1">
+                  <span className="text-sm text-ok flex items-center gap-1">
                     <Send className="w-3 h-3" />
-                    Telegram'a İletildi
+                    Telegram&apos;a iletildi
                   </span>
                 )}
               </div>
 
-              <div className="flex items-center gap-3 text-xs text-slate-500 font-mono">
-                <span className="flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5" />
-                  {new Date(ann.created_at).toLocaleString('tr-TR')}
-                </span>
-
-                {/* Silme Butonu (Yetki Kontrollü) */}
+              <div className="flex items-center gap-2 text-sm text-ink-3">
+                {new Date(ann.created_at).toLocaleDateString('tr-TR')}
                 {(profile?.id === ann.author_id || role === 'hoca' || role === 'yonetici') && (
                   <button
                     onClick={() => handleDelete(ann.id, ann.author_id)}
-                    className="text-slate-500 hover:text-red-400 transition p-1"
-                    title="Duyuruyu Sil"
+                    className="text-ink-3 hover:text-danger transition p-1"
+                    title="Duyuruyu sil"
+                    aria-label="Duyuruyu sil"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -230,140 +213,92 @@ export default function AnnouncementsPage() {
             </div>
 
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-white font-serif leading-snug">
+              <h2 className="text-lg font-semibold text-ink">
                 {ann.title}
               </h2>
-              <p className="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed whitespace-pre-line">
+              <p className="text-sm text-ink-2 mt-2 leading-relaxed whitespace-pre-line">
                 {ann.content}
               </p>
             </div>
 
-            <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+            <div className="flex items-center justify-between text-sm text-ink-3 border-t border-line pt-3">
               <div className="flex items-center gap-2">
-                <User className="w-3.5 h-3.5 text-slate-500" />
-                <span>Ekleyen: <strong>{ann.author?.full_name || 'Grup Üyesi'}</strong></span>
-                {ann.author && <RoleBadge role={ann.author.role} />}
+                <User className="w-3.5 h-3.5" />
+                <span>
+                  {ann.author?.full_name || 'Grup üyesi'}
+                </span>
+                {ann.author && <YetkiRozeti yetki={ann.author.yetki} />}
               </div>
             </div>
-          </div>
+          </Panel>
         ))}
       </div>
 
       {/* YENİ DUYURU MODALI */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
-            <div className="border-b border-slate-800 pb-3">
-              <h2 className="text-base font-bold text-white font-serif flex items-center gap-2">
-                <Send className="w-4 h-4 text-red-400" />
-                Yeni Duyuru Paylaşımı
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-paper/80">
+          <div className="bg-surface border border-line rounded-lg max-w-lg w-full p-6 space-y-5">
+            <div className="border-b border-line pb-3">
+              <h2 className="text-lg font-semibold text-ink">
+                Yeni duyuru paylaşımı
               </h2>
-              <p className="text-xs text-slate-400 mt-1">
-                Öncelik seçiminiz Telegram bildirim davranışını doğrudan belirler.
+              <p className="text-sm text-ink-3 mt-1">
+                Öncelik seçiminiz Telegram bildirim davranışını belirler.
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+            <form onSubmit={handleSubmit} className="space-y-4 text-sm">
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">
-                  Öncelik ve Kategori Seçimi *
+                <label className="block text-ink font-semibold mb-2">
+                  Öncelik ve kategori *
                 </label>
                 <div className="grid grid-cols-2 gap-2">
-                  <label
-                    className={`p-2.5 rounded-lg border cursor-pointer flex flex-col justify-between ${
-                      priority === 'toplanti'
-                        ? 'bg-amber-950/40 border-amber-600 text-amber-200'
-                        : 'bg-slate-950 border-slate-800 text-slate-400'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="priority"
-                      value="toplanti"
-                      checked={priority === 'toplanti'}
-                      onChange={() => setPriority('toplanti')}
-                      className="sr-only"
-                    />
-                    <span className="font-bold flex items-center gap-1">📅 Toplantı</span>
-                    <span className="text-[10px] text-amber-400/90 mt-1">Telegram Gruba Bildirilir</span>
-                  </label>
-
-                  <label
-                    className={`p-2.5 rounded-lg border cursor-pointer flex flex-col justify-between ${
-                      priority === 'acil'
-                        ? 'bg-red-950/40 border-red-600 text-red-200'
-                        : 'bg-slate-950 border-slate-800 text-slate-400'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="priority"
-                      value="acil"
-                      checked={priority === 'acil'}
-                      onChange={() => setPriority('acil')}
-                      className="sr-only"
-                    />
-                    <span className="font-bold flex items-center gap-1">🚨 Acil Duyuru</span>
-                    <span className="text-[10px] text-red-400/90 mt-1">Telegram Gruba Anında Bildirim</span>
-                  </label>
-
-                  <label
-                    className={`p-2.5 rounded-lg border cursor-pointer flex flex-col justify-between ${
-                      priority === 'soru_yardim'
-                        ? 'bg-slate-800 border-slate-600 text-white'
-                        : 'bg-slate-950 border-slate-800 text-slate-400'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="priority"
-                      value="soru_yardim"
-                      checked={priority === 'soru_yardim'}
-                      onChange={() => setPriority('soru_yardim')}
-                      className="sr-only"
-                    />
-                    <span className="font-bold">💬 Soru / Yardım</span>
-                    <span className="text-[10px] text-slate-500 mt-1">Sadece portal içi akış</span>
-                  </label>
-
-                  <label
-                    className={`p-2.5 rounded-lg border cursor-pointer flex flex-col justify-between ${
-                      priority === 'kaynak_paylasimi'
-                        ? 'bg-slate-800 border-slate-600 text-white'
-                        : 'bg-slate-950 border-slate-800 text-slate-400'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="priority"
-                      value="kaynak_paylasimi"
-                      checked={priority === 'kaynak_paylasimi'}
-                      onChange={() => setPriority('kaynak_paylasimi')}
-                      className="sr-only"
-                    />
-                    <span className="font-bold">📚 Kaynak Paylaşımı</span>
-                    <span className="text-[10px] text-slate-500 mt-1">Sadece portal içi akış</span>
-                  </label>
+                  {[
+                    { value: 'toplanti', label: 'Toplantı', desc: 'Telegram gruba bildirilir' },
+                    { value: 'acil', label: 'Acil duyuru', desc: 'Telegram gruba anında' },
+                    { value: 'soru_yardim', label: 'Soru / yardım', desc: 'Portal içi akış' },
+                    { value: 'kaynak_paylasimi', label: 'Kaynak paylaşımı', desc: 'Portal içi akış' },
+                  ].map((opt) => (
+                    <label
+                      key={opt.value}
+                      className={`p-3 rounded-md border cursor-pointer flex flex-col justify-between ${
+                        priority === opt.value
+                          ? 'bg-primary text-on-primary border-primary'
+                          : 'bg-sunken text-ink-2 border-line'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="priority"
+                        value={opt.value}
+                        checked={priority === opt.value}
+                        onChange={() => setPriority(opt.value as AnnouncementPriority)}
+                        className="sr-only"
+                      />
+                      <span className="font-semibold">{opt.label}</span>
+                      <span className="text-xs mt-1 text-ink-3">{opt.desc}</span>
+                    </label>
+                  ))}
                 </div>
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">
-                  Duyuru Başlığı *
+                <label className="block text-ink font-semibold mb-1">
+                  Duyuru başlığı *
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="Örn: 2026 Güz Dönemi VASP Kota Paylaşımı"
+                  placeholder="Örn: 2026 Güz dönemi VASP kota paylaşımı"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-red-600"
+                  className="w-full px-3 py-2 bg-sunken border border-control rounded-md text-ink placeholder-ink-3 focus:outline-none focus-visible:border-link focus-visible:ring-2 focus-visible:ring-link/30"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">
-                  Duyuru İçeriği *
+                <label className="block text-ink font-semibold mb-1">
+                  Duyuru içeriği *
                 </label>
                 <textarea
                   required
@@ -371,25 +306,26 @@ export default function AnnouncementsPage() {
                   placeholder="Detaylı bilgi, tarih veya talimatlar..."
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-red-600"
+                  className="w-full px-3 py-2 bg-sunken border border-control rounded-md text-ink placeholder-ink-3 focus:outline-none focus-visible:border-link focus-visible:ring-2 focus-visible:ring-link/30"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
-                <button
-                  type="button"
+              <div className="flex justify-end gap-2 pt-2 border-t border-line">
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-lg transition"
                 >
                   İptal
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2 bg-red-800 hover:bg-red-700 text-white font-bold rounded-lg transition shadow-md disabled:opacity-50"
                 >
-                  {isSubmitting ? 'Gönderiliyor...' : 'Yayınla ve Bildir'}
-                </button>
+                  {isSubmitting ? 'Gönderiliyor...' : 'Yayınla ve bildir'}
+                </Button>
               </div>
             </form>
           </div>

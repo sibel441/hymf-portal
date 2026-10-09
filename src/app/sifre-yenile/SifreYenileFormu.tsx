@@ -68,7 +68,7 @@ export function SifreYenileFormu() {
       {successMessage && (
         <div className="space-y-4">
           <Uyari tone="basari">{successMessage}</Uyari>
-          <Link href="/" className="block text-center text-link hover:underline text-sm font-medium">
+          <Link href="/" className="block text-sm font-medium text-link hover:underline">
             Ana sayfaya dön
           </Link>
         </div>

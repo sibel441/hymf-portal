@@ -13,12 +13,10 @@ export default async function GirisPage(props: GirisPageProps) {
   const hataMetni = hata === 'baglanti' ? 'Bağlantının süresi dolmuş veya geçersiz. Yeniden deneyin.' : null;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-paper px-4 py-12">
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <h1 className="font-serif text-3xl mb-2">Giriş Yapın</h1>
-          <p className="text-ink-3 text-sm">E-posta ve şifrenizle oturum açın</p>
-        </div>
+    <div className="mx-auto max-w-sm py-4 sm:py-10">
+      <h1 className="font-serif text-2xl text-ink sm:text-4xl">Giriş yap</h1>
+      <p className="mt-2 text-base text-ink-2">Grup e-posta adresiniz ve şifrenizle.</p>
+      <div className="mt-8">
         <GirisFormu next={validNext} hataParam={hataMetni} />
       </div>
     </div>

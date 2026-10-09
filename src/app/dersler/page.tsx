@@ -3,12 +3,7 @@
 import React, { useState } from 'react';
 import {
   BookOpen,
-  Calendar,
-  CheckCircle2,
-  Clock,
   Download,
-  FileText,
-  GraduationCap,
   Plus,
   ShieldAlert,
   User,
@@ -16,7 +11,12 @@ import {
 import { useAuth } from '@/context/AuthContext';
 import { INITIAL_COURSES } from '@/lib/mockData';
 import { Course, CourseMaterial } from '@/types/database';
-import { RoleBadge } from '@/components/RoleBadge';
+import {
+  SayfaBasligi,
+  OrnekVeriNotu,
+  Panel,
+  Button,
+} from '@/components/ui';
 
 export default function CoursesPage() {
   const { profile, role } = useAuth();
@@ -69,169 +69,166 @@ export default function CoursesPage() {
 
   return (
     <div className="space-y-8">
-      {/* Üst Başlık ve Yetki Bildirimi */}
-      <div className="border-b border-slate-800 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-mono text-red-400 mb-1">
-            <GraduationCap className="w-4 h-4" />
-            <span>LİSANSÜSTÜ AKADEMİK DERS PORTALI</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold font-serif text-white">
-            Lisansüstü Dersler & Materyaller
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl">
-            Öğretim üyelerimizin verdiği yüksek lisans ve doktora derslerinin haftalık slaytları, syllabus belgeleri ve ek kaynakları.
-          </p>
-        </div>
+      <SayfaBasligi
+        baslik="Lisansüstü dersler"
+        aciklama="Yüksek lisans ve doktora derslerinin haftalık slaytları, syllabus belgeleri ve ek kaynakları."
+        eylemler={
+          canUploadMaterial ? (
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setIsModalOpen(true)}
+            >
+              <Plus className="w-4 h-4" />
+              <span>Ders materyali ekle</span>
+            </Button>
+          ) : (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-sunken border border-line text-sm text-ink-3">
+              <ShieldAlert className="w-4 h-4" />
+              <span>Materyal ekleme yetkisi yalnızca hoca ve yöneticilerdedir.</span>
+            </div>
+          )
+        }
+      />
 
-        {canUploadMaterial ? (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-red-800 hover:bg-red-700 text-white text-xs font-bold transition shadow-md cursor-pointer shrink-0"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Ders Materyali Ekle</span>
-          </button>
-        ) : (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-[11px] text-slate-400">
-            <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
-            <span>Materyal ekleme yetkisi yalnızca hoca ve yöneticilerdedir.</span>
-          </div>
-        )}
-      </div>
+      <OrnekVeriNotu />
 
       {/* Ders Seçim Sekmeleri */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {courses.map((course) => (
-          <div
+          <button
             key={course.id}
             onClick={() => setSelectedCourse(course)}
-            className={`p-5 rounded-xl border transition cursor-pointer flex flex-col justify-between ${
+            className={`p-5 rounded-lg border-2 text-left transition cursor-pointer flex flex-col justify-between ${
               selectedCourse.id === course.id
-                ? 'bg-slate-900 border-red-600 shadow-md ring-1 ring-red-600'
-                : 'bg-slate-900/60 border-slate-800 hover:border-slate-700'
+                ? 'bg-surface border-primary'
+                : 'bg-surface border-line hover:border-line-strong'
             }`}
           >
             <div>
-              <div className="flex items-center justify-between text-xs mb-2">
-                <span className="font-mono px-2 py-0.5 rounded bg-slate-800 text-red-400 font-bold">
+              <div className="flex items-center justify-between text-sm mb-2">
+                <span className="font-mono px-2 py-0.5 rounded bg-sunken text-ink font-semibold">
                   {course.code}
                 </span>
-                <span className="text-slate-400 font-mono text-[11px]">{course.semester}</span>
+                <span className="text-ink-3 font-mono text-xs">{course.semester}</span>
               </div>
-              <h2 className="text-base font-bold text-white font-serif">
+              <h2 className="text-lg font-semibold text-ink">
                 {course.name}
               </h2>
-              <div className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5 text-slate-500" />
-                <span>Dersi Veren: <strong className="text-slate-200">{course.instructor?.full_name}</strong></span>
+              <div className="text-sm text-ink-3 mt-2 flex items-center gap-1.5">
+                <User className="w-4 h-4" />
+                <span>Dersi veren: {course.instructor?.full_name}</span>
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-              <span>{course.materials?.length || 0} Hafta Materyali</span>
-              <span className="text-red-400 font-semibold text-[11px]">
-                {selectedCourse.id === course.id ? 'Seçili Ders' : 'Görüntüle →'}
+            <div className="mt-4 pt-3 border-t border-line flex items-center justify-between text-sm text-ink-3">
+              <span>{course.materials?.length || 0} hafta materyali</span>
+              <span className="text-primary font-medium text-sm">
+                {selectedCourse.id === course.id ? 'Seçili' : 'Görüntüle'}
               </span>
             </div>
-          </div>
+          </button>
         ))}
       </div>
 
       {/* Seçilen Ders Detayı ve Haftalık Materyaller */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-6">
-        <div className="border-b border-slate-800 pb-4">
-          <div className="flex flex-wrap items-center justify-between gap-2">
+      <Panel className="space-y-6">
+        <div className="border-b border-line pb-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
             <div>
-              <span className="font-mono text-xs text-red-400 font-bold">[{selectedCourse.code}]</span>
-              <h2 className="text-xl font-bold text-white font-serif">
-                {selectedCourse.name} - {selectedCourse.instructor?.full_name}
+              <span className="font-mono text-sm text-ink-3">{selectedCourse.code}</span>
+              <h2 className="text-2xl font-semibold text-ink mt-1">
+                {selectedCourse.name}
               </h2>
+              <p className="text-sm text-ink-2 mt-1">
+                Dersi veren: {selectedCourse.instructor?.full_name}
+              </p>
             </div>
-            <span className="px-3 py-1 rounded bg-slate-800 text-xs font-mono text-slate-300">
+            <span className="px-3 py-1 rounded-md bg-sunken text-xs font-mono text-ink-3">
               {selectedCourse.semester}
             </span>
           </div>
 
           {selectedCourse.syllabus && (
-            <div className="mt-3 p-3.5 rounded-lg bg-slate-950/70 border border-slate-800 text-xs text-slate-300 space-y-1">
-              <strong className="text-slate-200 font-semibold flex items-center gap-1.5">
-                <BookOpen className="w-3.5 h-3.5 text-amber-400" />
-                Ders İzlencesi (Syllabus):
+            <div className="mt-4 p-4 rounded-md bg-sunken border border-line text-sm text-ink space-y-2">
+              <strong className="text-ink font-semibold flex items-center gap-1.5">
+                <BookOpen className="w-4 h-4" />
+                Ders izlencesi (syllabus)
               </strong>
-              <p className="text-slate-400 leading-relaxed">{selectedCourse.syllabus}</p>
+              <p className="text-ink-2 leading-relaxed">{selectedCourse.syllabus}</p>
             </div>
           )}
         </div>
 
         {/* Hafta Hafta Materyaller Listesi */}
         <div className="space-y-3">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-            Haftalık Ders Notları & Slaytlar
+          <h3 className="text-sm font-semibold text-ink">
+            Haftalık ders notları ve slaytlar
           </h3>
 
           {selectedCourse.materials && selectedCourse.materials.length > 0 ? (
-            selectedCourse.materials.map((mat) => (
-              <div
-                key={mat.id}
-                className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-slate-700 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-              >
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded bg-red-950 text-red-300 text-[10px] font-bold font-mono border border-red-800/80">
-                      Hafta {mat.week_number}
-                    </span>
-                    <h4 className="text-xs sm:text-sm font-semibold text-white">
-                      {mat.title}
-                    </h4>
-                  </div>
-                  {mat.description && (
-                    <p className="text-xs text-slate-400 leading-snug">
-                      {mat.description}
-                    </p>
-                  )}
-                  <div className="text-[10px] text-slate-500 font-mono">
-                    Ekleyen: {mat.uploader?.full_name} • {new Date(mat.created_at).toLocaleDateString('tr-TR')}
-                  </div>
-                </div>
-
-                <a
-                  href={mat.file_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition shrink-0 self-start sm:self-center"
+            <div className="space-y-2 border-t border-line pt-3">
+              {selectedCourse.materials.map((mat) => (
+                <div
+                  key={mat.id}
+                  className="p-4 rounded-md bg-sunken border border-line hover:border-line-strong transition flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                 >
-                  <Download className="w-3.5 h-3.5 text-red-400" />
-                  <span>Slayt / Not İndir (PDF)</span>
-                </a>
-              </div>
-            ))
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded text-xs font-medium font-mono bg-warn-soft text-warn">
+                        Hafta {mat.week_number}
+                      </span>
+                      <h4 className="text-sm font-semibold text-ink">
+                        {mat.title}
+                      </h4>
+                    </div>
+                    {mat.description && (
+                      <p className="text-sm text-ink-2 leading-snug">
+                        {mat.description}
+                      </p>
+                    )}
+                    <div className="text-xs text-ink-3">
+                      Ekleyen: {mat.uploader?.full_name} • {new Date(mat.created_at).toLocaleDateString('tr-TR')}
+                    </div>
+                  </div>
+
+                  <a
+                    href={mat.file_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-primary text-on-primary text-sm font-medium transition shrink-0 self-start sm:self-center hover:opacity-90"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Slayt / not indir</span>
+                  </a>
+                </div>
+              ))}
+            </div>
           ) : (
-            <div className="p-8 text-center text-xs text-slate-500 bg-slate-950/40 rounded-xl border border-dashed border-slate-800">
+            <div className="p-8 text-center text-sm text-ink-3 bg-sunken rounded-md border border-dashed border-line">
               Bu ders için henüz haftalık materyal yüklenmemiştir.
             </div>
           )}
         </div>
-      </div>
+      </Panel>
 
       {/* DERS MATERYALİ YÜKLEME MODALI */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
-            <div className="border-b border-slate-800 pb-3">
-              <h2 className="text-base font-bold text-white font-serif flex items-center gap-2">
-                <Plus className="w-4 h-4 text-red-400" />
-                Ders Materyali Ekle ({selectedCourse.code})
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-paper/80">
+          <div className="bg-surface border border-line rounded-lg max-w-lg w-full p-6 space-y-4">
+            <div className="border-b border-line pb-3">
+              <h2 className="text-lg font-semibold text-ink">
+                Ders materyali ekle ({selectedCourse.code})
               </h2>
-              <p className="text-xs text-slate-400 mt-1">
-                Yalnızca sorumlu hoca veya hoca adına asiste eden yönetici öğrenci ekleyebilir.
+              <p className="text-sm text-ink-3 mt-1">
+                Yalnızca sorumlu hoca veya hoca adına asiste eden yönetici ekleyebilir.
               </p>
             </div>
 
-            <form onSubmit={handleAddMaterial} className="space-y-4 text-xs">
+            <form onSubmit={handleAddMaterial} className="space-y-4 text-sm">
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Hafta No *</label>
+                  <label className="block text-ink font-semibold mb-1">Hafta no *</label>
                   <input
                     type="number"
                     min={1}
@@ -239,36 +236,36 @@ export default function CoursesPage() {
                     required
                     value={weekNumber}
                     onChange={(e) => setWeekNumber(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-red-600"
+                    className="w-full px-3 py-2 bg-sunken border border-control rounded-md text-ink focus:outline-none focus-visible:border-link focus-visible:ring-2 focus-visible:ring-link/30"
                   />
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-slate-300 font-semibold mb-1">Ders Konusu / Başlık *</label>
+                  <label className="block text-ink font-semibold mb-1">Ders konusu / başlık *</label>
                   <input
                     type="text"
                     required
-                    placeholder="Örn: Bloch Teoremi ve Bant Yapısı"
+                    placeholder="Örn: Bloch teoremi ve bant yapısı"
                     value={matTitle}
                     onChange={(e) => setMatTitle(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-red-600"
+                    className="w-full px-3 py-2 bg-sunken border border-control rounded-md text-ink placeholder-ink-3 focus:outline-none focus-visible:border-link focus-visible:ring-2 focus-visible:ring-link/30"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Açıklama / Kapsam</label>
+                <label className="block text-ink font-semibold mb-1">Açıklama / kapsam</label>
                 <textarea
                   rows={2}
                   placeholder="Bu haftanın slayt içeriği veya okuma önerisi..."
                   value={matDesc}
                   onChange={(e) => setMatDesc(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-red-600"
+                  className="w-full px-3 py-2 bg-sunken border border-control rounded-md text-ink placeholder-ink-3 focus:outline-none focus-visible:border-link focus-visible:ring-2 focus-visible:ring-link/30"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">
-                  Materyal Dosya Bağlantısı (PDF Dosyası) *
+                <label className="block text-ink font-semibold mb-1">
+                  Materyal dosya bağlantısı (PDF dosyası) *
                 </label>
                 <input
                   type="text"
@@ -276,27 +273,29 @@ export default function CoursesPage() {
                   placeholder="2026_10_DERS_FIZ601_Hafta4_HocaAdi.pdf"
                   value={fileUrl}
                   onChange={(e) => setFileUrl(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-red-600"
+                  className="w-full px-3 py-2 bg-sunken border border-control rounded-md text-ink placeholder-ink-3 focus:outline-none focus-visible:border-link focus-visible:ring-2 focus-visible:ring-link/30"
                 />
-                <span className="text-[10px] text-slate-500 mt-1 block">
-                  Format standardı: <code>Yil_Ay_DERS_[DersKodu]_[Hafta]_[Ekleyen].pdf</code>
+                <span className="text-xs text-ink-3 mt-1 block">
+                  Format standardı: <code className="font-mono">Yil_Ay_DERS_[DersKodu]_[Hafta]_[Ekleyen].pdf</code>
                 </span>
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-slate-800">
-                <button
+              <div className="flex justify-end gap-2 pt-3 border-t border-line">
+                <Button
+                  variant="ghost"
+                  size="sm"
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-lg transition"
                 >
                   İptal
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
                   type="submit"
-                  className="px-4 py-2 bg-red-800 hover:bg-red-700 text-white font-bold rounded-lg transition shadow-md"
                 >
-                  Materyali Kaydet
-                </button>
+                  Materyali kaydet
+                </Button>
               </div>
             </form>
           </div>

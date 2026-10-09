@@ -106,7 +106,7 @@ export function GirisFormu({ next, hataParam }: GirisFormuProps) {
       {errorMessage && <Uyari tone="tehlike">{errorMessage}</Uyari>}
 
       <form onSubmit={handleLogin} className="space-y-5">
-        <Alan etiket="E-posta Adresi" htmlFor="email">
+        <Alan etiket="E-posta adresi" htmlFor="email">
           <input
             id="email"
             type="email"
@@ -126,9 +126,9 @@ export function GirisFormu({ next, hataParam }: GirisFormuProps) {
             <button
               type="button"
               onClick={() => setIsForgotOpen(true)}
-              className="text-xs text-link hover:underline"
+              className="text-sm text-link hover:underline"
             >
-              Şifremi unuttum?
+              Şifremi unuttum
             </button>
           </div>
           <input
@@ -143,20 +143,20 @@ export function GirisFormu({ next, hataParam }: GirisFormuProps) {
         </div>
 
         <Button type="submit" variant="primary" disabled={isLoading} className="w-full">
-          {isLoading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+          {isLoading ? 'Giriş yapılıyor…' : 'Giriş yap'}
         </Button>
       </form>
 
-      <div className="text-center text-sm text-ink-2">
+      <div className="text-sm text-ink-2">
         Hesabınız yok mu?{' '}
         <Link href="/kayit" className="text-link hover:underline font-medium">
-          Kaydolun
+          Kayıt olun
         </Link>
       </div>
 
       {DEMO_MODU && (
         <div className="mt-8 pt-6 border-t border-line space-y-3">
-          <p className="text-xs text-ink-3 text-center font-medium">Demo test hesapları</p>
+          <p className="text-sm font-medium text-ink-2">Örnek hesaplar (demo)</p>
           <div className="grid grid-cols-1 gap-2">
             {INITIAL_PROFILES.map((p) => (
               <button
@@ -167,7 +167,7 @@ export function GirisFormu({ next, hataParam }: GirisFormuProps) {
                   router.replace(next);
                   router.refresh();
                 }}
-                className="p-3 rounded-md bg-sunken hover:bg-sunken/80 text-left text-xs transition border border-line"
+                className="p-3 rounded-md bg-sunken hover:bg-sunken/80 text-left text-sm transition border border-line"
               >
                 <div className="font-medium text-ink">{p.full_name}</div>
                 <div className="text-ink-3">{p.email}</div>
@@ -178,11 +178,11 @@ export function GirisFormu({ next, hataParam }: GirisFormuProps) {
       )}
 
       {isForgotOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-paper/80 backdrop-blur-sm">
-          <div className="bg-surface border border-line rounded-lg w-full max-w-sm p-6 space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4">
+          <div role="dialog" aria-modal="true" aria-labelledby="sifre-sifirlama-baslik" className="w-full max-w-sm space-y-5 rounded-lg border border-line bg-surface p-6 shadow-lg">
             <div className="border-b border-line pb-4">
-              <h2 className="text-lg font-semibold text-ink">Şifre Sıfırlama</h2>
-              <p className="text-sm text-ink-3 mt-1">E-posta adresinize sıfırlama bağlantısı göndereceğiz</p>
+              <h2 id="sifre-sifirlama-baslik" className="text-lg font-semibold text-ink">Şifre sıfırlama</h2>
+              <p className="text-sm text-ink-3 mt-1">Adresinize şifre sıfırlama bağlantısı gönderilir.</p>
             </div>
 
             {resetSent ? (
@@ -202,7 +202,7 @@ export function GirisFormu({ next, hataParam }: GirisFormuProps) {
               </div>
             ) : (
               <form onSubmit={handleResetPassword} className="space-y-4">
-                <Alan etiket="E-posta Adresiniz" htmlFor="reset-email">
+                <Alan etiket="E-posta adresiniz" htmlFor="reset-email">
                   <input
                     id="reset-email"
                     type="email"
