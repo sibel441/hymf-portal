@@ -29,7 +29,7 @@ export default function MembersPage() {
     const matchesSearch =
       member.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       member.research_topics.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      member.academic_title.toLowerCase().includes(searchQuery.toLowerCase());
+      (member.academic_title ?? '').toLowerCase().includes(searchQuery.toLowerCase());
 
     return matchesRole && matchesSearch;
   });
