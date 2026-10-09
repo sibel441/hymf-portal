@@ -10,7 +10,7 @@ export default async function GirisPage(props: GirisPageProps) {
   const validNext = guvenliIcYol(params.next);
   const hata = params.hata;
 
-  const hataMetni = hata === 'baglanti' ? 'Bağlantının süresi dolmuş veya geçersiz. Yeniden deneyin.' : null;
+  const hataMetni = hata === 'baglanti' ? 'Bağlantı bu tarayıcıda tamamlanamadı. E-postanızı doğruladıysanız giriş yapabilirsiniz; şifre sıfırlıyorsanız yeni bir bağlantı isteyin.' : null;
 
   return (
     <div className="mx-auto max-w-sm py-4 sm:py-10">

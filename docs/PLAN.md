@@ -639,7 +639,7 @@ interface AuthContextType {
 
 | Rota | Erişim | Sahip |
 | --- | --- | --- |
-| `/` | Herkes. Üye özeti yalnız girişli üyeye. | H7 (veri), orkestratör (görsel) |
+| `/` | Herkes. Üye özeti yalnız girişli üyeye. | Orkestratör |
 | `/giris`, `/kayit` | Herkes | H3 |
 | `/auth/callback` | Herkes (route handler) | H3 |
 | `/sifre-yenile` | Oturum | H3 |
@@ -652,7 +652,7 @@ interface AuthContextType {
 | `/yonetim/gecmis` (İşlem geçmişi) | admin, superadmin | H6 |
 | `/profil` | Üye | H7 |
 | `/uyeler` | Üye | H7 |
-| `/duyurular`, `/kaynaklar`, `/dersler`, `/toplantilar` | Herkes, mock + "Örnek veri" notu | H7 (not), H8 (sınıflar) |
+| `/duyurular`, `/kaynaklar`, `/dersler`, `/toplantilar` | Herkes, mock + "Örnek veri" notu | H8 |
 | `/kilavuzlar`, `/formlar` | Herkes, statik | H8 |
 
 ## 6. Bileşen sözleşmeleri (Dalga 2)
@@ -684,15 +684,15 @@ Bir ajan yalnız kendi satırındaki dosyalara yazar. "Okur" sütunu bağımlıl
 
 | Ajan | Yazar | Okur |
 | --- | --- | --- |
-| Orkestratör | `docs/**`, `src/types/database.ts`, `src/lib/{etiketler,yetki,zaman,cn}.ts`, `src/components/ui/**`, `src/app/globals.css`, `src/app/layout.tsx`, `src/components/{Navbar,Footer}.tsx` (H3'ün Navbar kısmı hariç; `RoleBadge` yerine `ui/YetkiRozeti`), `src/lib/mockData.ts` (tip uyumu), Dalga 2 iskeletleri, `src/app/page.tsx` görsel geçişi | hepsi |
+| Orkestratör | `docs/**`, `src/types/database.ts`, `src/lib/{etiketler,yetki,zaman,cn}.ts`, `src/components/ui/**`, `src/app/globals.css`, `src/app/layout.tsx`, `src/components/{Navbar,Footer}.tsx` (H3'ün Navbar kısmı hariç; `RoleBadge` yerine `ui/YetkiRozeti`), `src/lib/mockData.ts` (tip uyumu), Dalga 2 iskeletleri, `src/app/page.tsx` (veri ve görsel; H7'den alındı, iki kez yazılmasın diye) | hepsi |
 | H1 SQL | `supabase/schema.sql`, `supabase/migrations/20261009000000_calisma_alani.sql`, `supabase/seed_uyeler.sql`, `supabase/tests/rls_kontrol.sql` | PLAN.md |
 | H2 veri | `src/lib/data/{_sonuc,profiles,workspaces,plan,progress,files,admin}.ts`, `src/lib/calisma/hesap.ts` | tipler, `src/lib/supabase/*` |
 | H3 auth | `src/context/AuthContext.tsx`, `src/app/giris/page.tsx`, `src/app/kayit/page.tsx`, `src/app/onay-bekleniyor/page.tsx` (+ yalnız bu klasörde istemci bileşeni), `src/app/sifre-yenile/page.tsx`, `src/app/auth/callback/route.ts`, `src/proxy.ts`, `src/lib/supabase/proxy.ts`, `src/lib/auth/dal.ts`, `src/lib/demo.ts`, `.env.local.example`, `src/components/Navbar.tsx` (**yalnız** demo rol değiştirici bloğu ve onu besleyen import/state) | tipler, ui |
 | H4 öğrenci görünümü | `src/components/calisma/{CalismaAlani,TezBilgisi,PlanListesi,PlanMaddesiFormu,IlerlemeKutusu,Defter,Dosyalar,IslemGecmisi}.tsx` | veri katmanı, ui |
 | H5 pano | `src/app/calisma-alani/page.tsx`, `src/app/calisma-alani/[ogrenciId]/page.tsx`, `src/components/calisma/{DanismanPanosu,TopluEkle}.tsx` | `CalismaAlani` (import), veri katmanı, dal, ui |
 | H6 yönetim | `src/app/yonetim/**`, `src/components/yonetim/**` | veri katmanı, dal, ui |
-| H7 vitrin | `src/app/uyeler/page.tsx`, `src/app/profil/page.tsx`, `src/app/page.tsx` (yalnız veri bağlantısı), `src/app/{duyurular,kaynaklar,dersler,toplantilar}/page.tsx` (yalnız "Örnek veri" notu ve `role` uyumu) | veri katmanı, ui |
-| H8 cila (opsiyonel) | Orkestratörün vereceği sayfa listesi | DESIGN.md §9 eşleştirme tablosu |
+| H7 vitrin | `src/app/uyeler/**`, `src/app/profil/**` | veri katmanı, dal, ui |
+| H8 cila (Dalga 2'ye alındı) | `src/app/{duyurular,kaynaklar,dersler,toplantilar,kilavuzlar,formlar}/page.tsx`, `src/components/CodeBlock.tsx` ("Örnek veri" notu dahil) | DESIGN.md §9 eşleştirme tablosu, ui |
 
 ## 8. Dalgalar ve commit'ler
 
@@ -700,8 +700,8 @@ Bir ajan yalnız kendi satırındaki dosyalara yazar. "Okur" sütunu bağımlıl
 | --- | --- | --- |
 | 0 | Git, PLAN, DESIGN, sözleşme dosyaları, ui bileşenleri | `docs: çalışma alanı planı ve tasarım rehberi`, `feat(ui): tasarım token'ları ve ortak bileşenler` |
 | 1 | H1, H2, H3 paralel | `feat(db): ...`, `feat(data): ...`, `fix(auth): ...` |
-| 2 | H4, H5, H6, H7 paralel | `feat(calisma-alani): ...`, `feat(yonetim): ...`, `feat(uyeler): ...` |
-| 3 | Görsel geçiş (orkestratör), H8 | `style: ...` |
+| 2 | H4, H5, H6, H7, H8 paralel | `feat(calisma-alani): ...`, `feat(yonetim): ...`, `feat(uyeler): ...` |
+| 3 | Navbar, ana sayfa ve yeni sayfaların görsel geçişi (orkestratör) | `style: ...` |
 | 4 | Doğrulama, KURULUM.md | `docs: kurulum adımları` |
 | 5 | Push, PR | |
 
@@ -716,3 +716,5 @@ Her dalga sonunda: `npx tsc --noEmit`, `npm run lint`; Dalga 2 sonrası `npm run
 4. Migration ilk çalıştığında allowlist dışındaki eski hesapların onayı kalkıyor.
 5. Mustafa ve Sena'nın danışmanlığı resmî değil ama sistemde danışman olarak görünüyor (eş danışman
    ayrımı yok).
+6. Supabase'in yerleşik SMTP'si üyelere doğrulama e-postası göndermeyebilir (KURULUM.md §1).
+7. `scholar_url` kısıtı `not valid`: eski satırlar denetlenmez, yalnız yeni yazımlar.
