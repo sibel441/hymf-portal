@@ -219,7 +219,8 @@ export type UyelikLogAction =
   | 'danisman_birincil'
   | 'davet_eklendi'
   | 'davet_guncellendi'
-  | 'davet_silindi';
+  | 'davet_silindi'
+  | 'sifre_sifirlandi';
 
 export interface UyelikLogDetails {
   hedef_ad?: string | null;

@@ -7,7 +7,7 @@ import type { Profile, AdvisorAssignment, Kadro } from '@/types/database';
 import { KADROLAR } from '@/types/database';
 import { KADRO_ETIKETI, kisaAd } from '@/lib/etiketler';
 import { kisaTarih } from '@/lib/zaman';
-import { uyeyiOnayla, uyeyiGuncelle, aktiflikDegistir, danismanEkle, danismanCikar, birincilDanismanYap } from '@/app/yonetim/actions';
+import { uyeyiOnayla, uyeyiGuncelle, aktiflikDegistir, danismanEkle, danismanCikar, birincilDanismanYap, sifreSifirla } from '@/app/yonetim/actions';
 
 interface UyeleriYonetProps {
   profiles: Profile[];
@@ -83,6 +83,22 @@ export function UyeleriYonet({ profiles, advisorAssignments, hocaKadrosuKisitli 
       const result = await aktiflikDegistir(id, aktif);
       if (result.ok) {
         setMessage({ type: 'success', text: aktif ? 'Yeniden etkinleştirildi' : 'Pasifleştirildi' });
+      } else {
+        setMessage({ type: 'error', text: result.error });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (p: Profile) => {
+    const onay = confirm(`${p.full_name} için yeni geçici şifre oluşturulsun mu? Eski şifresi geçersiz olur.`);
+    if (!onay) return;
+    setLoading(true);
+    try {
+      const result = await sifreSifirla(p.id);
+      if (result.ok) {
+        setMessage({ type: 'success', text: `Yeni giriş bilgilerini kişiye iletin: ${p.email} / ${result.sifre}` });
       } else {
         setMessage({ type: 'error', text: result.error });
       }
@@ -366,6 +382,16 @@ export function UyeleriYonet({ profiles, advisorAssignments, hocaKadrosuKisitli 
                           onClick={() => handleToggleActive(p.id, !p.is_active)}
                         >
                           {p.is_active ? 'Pasifleştir' : 'Yeniden etkinleştir'}
+                        </Button>
+                      )}
+                      {(!hocaKadrosuKisitli || (p.yetki === 'uye' && p.kadro !== 'hoca')) && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          disabled={loading}
+                          onClick={() => handleResetPassword(p)}
+                        >
+                          Şifre sıfırla
                         </Button>
                       )}
                     </div>

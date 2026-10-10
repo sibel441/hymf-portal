@@ -8,6 +8,9 @@ Sıra önemli: **önce veritabanı, sonra test, en son `npx vercel --prod`.** Ye
 - Authentication → Sign In / Providers: **"Allow new users to sign up" kapalı** olmalı. Portalda açık
   kayıt yok; hesapları yöneticiler /yonetim → Davetler → "Üye ekle" ile açar (geçici şifreyle, e-posta
   gerekmez). Açık kalırsa kayıt sayfası olmasa da API'den hesap açılabilir (onaysız kalır, yine de kapatın).
+- Şifre unutan üye: e-posta ile sıfırlama yok (yerleşik SMTP üyelere göndermez). Yönetici /yonetim →
+  Üyeler → Düzenle → "Şifre sıfırla" ile yeni geçici şifre verir. Hoca ve yönetici hesaplarınınkini
+  yalnız superadmin sıfırlar; işlem üyelik geçmişine yazılır.
 - Authentication → Providers → Email: **Confirm email açık** olmalı. Davet listesi yalnız e-posta
   doğrulanınca uygulanır; kapalıysa başkası Ata'nın adresiyle kayıt olup superadmin olabilir.
 - Authentication → URL Configuration: Site URL `https://hymf-portal.vercel.app`; Redirect URLs'e

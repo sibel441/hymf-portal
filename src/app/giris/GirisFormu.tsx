@@ -25,9 +25,6 @@ export function GirisFormu({ next, hataParam }: GirisFormuProps) {
   const [beniHatirla, setBeniHatirla] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(hataParam);
-  const [isForgotOpen, setIsForgotOpen] = useState(false);
-  const [resetEmail, setResetEmail] = useState('');
-  const [resetSent, setResetSent] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,27 +79,6 @@ export function GirisFormu({ next, hataParam }: GirisFormuProps) {
     setIsLoading(false);
   };
 
-  const handleResetPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!resetEmail) return;
-
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const hasValidSupabase = supabaseUrl && !supabaseUrl.includes('placeholder') && !supabaseUrl.includes('your-project');
-
-    if (hasValidSupabase) {
-      try {
-        const supabase = createClient();
-        await supabase.auth.resetPasswordForEmail(resetEmail, {
-          redirectTo: `${window.location.origin}/auth/callback?next=/sifre-yenile`,
-        });
-      } catch (err) {
-        console.warn('Reset password error:', err);
-      }
-    }
-
-    setResetSent(true);
-  };
-
   return (
     <div className="space-y-6">
       {errorMessage && <Uyari tone="tehlike">{errorMessage}</Uyari>}
@@ -121,18 +97,9 @@ export function GirisFormu({ next, hataParam }: GirisFormuProps) {
         </Alan>
 
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between mb-2">
-            <label htmlFor="password" className="text-sm font-medium text-ink">
-              Şifre
-            </label>
-            <button
-              type="button"
-              onClick={() => setIsForgotOpen(true)}
-              className="text-sm text-link hover:underline"
-            >
-              Şifremi unuttum
-            </button>
-          </div>
+          <label htmlFor="password" className="mb-2 block text-sm font-medium text-ink">
+            Şifre
+          </label>
           <input
             id="password"
             type="password"
@@ -160,7 +127,8 @@ export function GirisFormu({ next, hataParam }: GirisFormuProps) {
       </form>
 
       <div className="text-sm text-ink-2">
-        Hesabınız yok mu? Hesapları grup yöneticileri açar; onlara yazın.
+        Hesabınız yok ya da şifrenizi mi unuttunuz? Grup yöneticisine yazın: hesapları yöneticiler açar,
+        şifreyi de onlar sıfırlar.
       </div>
 
       {DEMO_MODU && (
@@ -182,62 +150,6 @@ export function GirisFormu({ next, hataParam }: GirisFormuProps) {
                 <div className="text-ink-3">{p.email}</div>
               </button>
             ))}
-          </div>
-        </div>
-      )}
-
-      {isForgotOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4">
-          <div role="dialog" aria-modal="true" aria-labelledby="sifre-sifirlama-baslik" className="w-full max-w-sm space-y-5 rounded-lg border border-line bg-surface p-6 shadow-lg">
-            <div className="border-b border-line pb-4">
-              <h2 id="sifre-sifirlama-baslik" className="text-lg font-semibold text-ink">Şifre sıfırlama</h2>
-              <p className="text-sm text-ink-3 mt-1">Adresinize şifre sıfırlama bağlantısı gönderilir.</p>
-            </div>
-
-            {resetSent ? (
-              <div className="space-y-4">
-                <Uyari tone="bilgi">E-posta adresinize sıfırlama bağlantısı gönderildi. Gelen kutuunuzu kontrol edin.</Uyari>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => {
-                    setIsForgotOpen(false);
-                    setResetSent(false);
-                  }}
-                  className="w-full"
-                >
-                  Kapat
-                </Button>
-              </div>
-            ) : (
-              <form onSubmit={handleResetPassword} className="space-y-4">
-                <Alan etiket="E-posta adresiniz" htmlFor="reset-email">
-                  <input
-                    id="reset-email"
-                    type="email"
-                    required
-                    placeholder="ad.soyad@ankara.edu.tr"
-                    value={resetEmail}
-                    onChange={(e) => setResetEmail(e.target.value)}
-                    className={inputSinifi}
-                  />
-                </Alan>
-
-                <div className="flex gap-3 pt-2">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => setIsForgotOpen(false)}
-                    className="flex-1"
-                  >
-                    Vazgeç
-                  </Button>
-                  <Button type="submit" variant="primary" className="flex-1">
-                    Bağlantı Gönder
-                  </Button>
-                </div>
-              </form>
-            )}
           </div>
         </div>
       )}

@@ -144,6 +144,8 @@ export function uyelikLogMetni(log: Pick<UyelikLog, 'action' | 'details' | 'targ
       return `${log.target_email} daveti güncellendi: ${kadroAdi(d.kadro)}, ${yetkiAdi(d.yetki)}`;
     case 'davet_silindi':
       return `${log.target_email} davet listesinden çıkarıldı`;
+    case 'sifre_sifirlandi':
+      return `${hedef} için şifre sıfırlandı`;
     default:
       return 'Üyelik işlemi';
   }

@@ -331,3 +331,57 @@ export async function yetkiVer(id: string, yetki: Yetki): Promise<ActionSonucu> 
     return { ok: false, error: e instanceof Error ? e.message : 'Beklenmeyen bir hata oluştu.' };
   }
 }
+
+export type SifreSifirlamaSonucu = { ok: true; sifre: string } | { ok: false; error: string };
+
+function geciciSifre(): string {
+  // Karışan karakterler (0/O, 1/l/I) yok; 12 karakter.
+  const harfler = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const rastgele = crypto.getRandomValues(new Uint32Array(12));
+  return Array.from(rastgele, (n) => harfler[n % harfler.length]).join('');
+}
+
+/** E-posta gönderilemediği için şifre unutan üyeye yönetici yeni geçici şifre verir. */
+export async function sifreSifirla(id: string): Promise<SifreSifirlamaSonucu> {
+  try {
+    const ben = await requireAdminAction();
+
+    if (!validateUUID(id)) return { ok: false, error: 'Geçersiz kullanıcı ID.' };
+
+    const sb = await createClient();
+    const { data: hedef, error } = await sb
+      .from('profiles')
+      .select('id, email, full_name, kadro, yetki')
+      .eq('id', id)
+      .maybeSingle();
+    if (error) return { ok: false, error: error.message };
+    if (!hedef) return { ok: false, error: 'Üye bulunamadı.' };
+
+    // Davet kuralıyla aynı: hoca ve yönetici hesaplarının şifresini yalnız sistem yöneticisi sıfırlar.
+    // Aksi halde bir yönetici başka bir yöneticinin ya da hocanın hesabını ele geçirebilirdi.
+    if (!isSuperadmin(ben) && (hedef.yetki !== 'uye' || hedef.kadro === 'hoca')) {
+      return { ok: false, error: 'Hoca ve yönetici hesaplarının şifresini yalnız sistem yöneticisi sıfırlayabilir.' };
+    }
+
+    const admin = createAdminClient();
+    if (!admin) return { ok: false, error: 'Sunucuda SUPABASE_SERVICE_ROLE_KEY tanımlı değil.' };
+
+    const sifre = geciciSifre();
+    const { error: guncellemeHatasi } = await admin.auth.admin.updateUserById(id, { password: sifre });
+    if (guncellemeHatasi) return { ok: false, error: 'Şifre sıfırlanamadı: ' + guncellemeHatasi.message };
+
+    // Servis anahtarıyla yapılan değişiklik trigger'lardan geçmez; işlem geçmişine burada yazılır.
+    await admin.from('uyelik_logs').insert({
+      actor_id: ben.id,
+      target_id: id,
+      target_email: hedef.email,
+      action: 'sifre_sifirlandi',
+      details: { hedef_ad: hedef.full_name },
+    });
+
+    revalidatePath('/yonetim', 'layout');
+    return { ok: true, sifre };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Beklenmeyen bir hata oluştu.' };
+  }
+}
