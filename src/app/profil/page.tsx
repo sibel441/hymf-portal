@@ -1,5 +1,6 @@
 import 'server-only';
 
+import Link from 'next/link';
 import { requireMember } from '@/lib/auth/dal';
 import { SayfaBasligi } from '@/components/ui';
 import { KADRO_ETIKETI, YETKI_ETIKETI } from '@/lib/etiketler';
@@ -34,7 +35,10 @@ export default async function ProfilPage() {
       </dl>
 
       <p className="text-sm text-ink-3">
-        Kadro ve yetki değişiklikleri için grup yöneticisine yazın.
+        Kadro ve yetki değişiklikleri için grup yöneticisine yazın.{' '}
+        <Link href="/sifre-yenile" className="text-link hover:underline">
+          Şifremi değiştir
+        </Link>
       </p>
 
       <ProfilFormu profil={ben} />

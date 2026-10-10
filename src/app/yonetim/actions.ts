@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdminAction } from '@/lib/auth/dal';
 import { isSuperadmin } from '@/lib/yetki';
 import type { Kadro, Yetki } from '@/types/database';
@@ -204,6 +205,8 @@ export async function davetEkle(input: {
   kadro: Kadro;
   yetki: Yetki;
   danismanEmail?: string;
+  /** Verilirse hesap hemen, e-postası doğrulanmış olarak açılır; kişi bu geçici şifreyle girer. */
+  sifre?: string;
 }): Promise<ActionSonucu> {
   try {
     await requireAdminAction();
@@ -217,6 +220,13 @@ export async function davetEkle(input: {
       return { ok: false, error: 'Geçersiz danışman e-postası.' };
     }
 
+    if (input.sifre !== undefined && (input.sifre.length < 8 || input.sifre.length > 72)) {
+      return { ok: false, error: 'Geçici şifre 8-72 karakter olmalıdır.' };
+    }
+
+    // Önce davet satırı yöneticinin kendi oturumuyla yazılır: kimin hangi kadro/yetkiyi verebileceğini
+    // RLS ve trigger denetler. Hesap ancak bu geçerse servis anahtarıyla açılır; yeni hesap kadro ve
+    // yetkisini yine bu satırdan alır (handle_new_user → apply_allowlist).
     const sb = await createClient();
     const result = await upsertAllowlist(sb, {
       email: input.email,
@@ -236,6 +246,26 @@ export async function davetEkle(input: {
     }
 
     revalidatePath('/yonetim', 'layout');
+
+    if (input.sifre) {
+      const admin = createAdminClient();
+      if (!admin) {
+        return { ok: false, error: 'Davet kaydedildi ama hesap açılamadı: sunucuda SUPABASE_SERVICE_ROLE_KEY tanımlı değil.' };
+      }
+      const { error } = await admin.auth.admin.createUser({
+        email: input.email.trim().toLowerCase(),
+        password: input.sifre,
+        email_confirm: true,
+        user_metadata: { full_name: input.full_name.trim() },
+      });
+      if (error) {
+        if (error.code === 'email_exists' || /already been registered/i.test(error.message)) {
+          return { ok: false, error: 'Bu e-postayla zaten bir hesap var; davet kaydı güncellendi, şifresi değiştirilmedi.' };
+        }
+        return { ok: false, error: 'Davet kaydedildi ama hesap açılamadı: ' + error.message };
+      }
+    }
+
     return { ok: true };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : 'Beklenmeyen bir hata oluştu.' };

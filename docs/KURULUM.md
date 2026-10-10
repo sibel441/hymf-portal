@@ -5,6 +5,9 @@ Sıra önemli: **önce veritabanı, sonra test, en son `npx vercel --prod`.** Ye
 
 ## 1. Supabase Auth ayarları (fkjjpjvozrexaxpvevum)
 
+- Authentication → Sign In / Providers: **"Allow new users to sign up" kapalı** olmalı. Portalda açık
+  kayıt yok; hesapları yöneticiler /yonetim → Davetler → "Üye ekle" ile açar (geçici şifreyle, e-posta
+  gerekmez). Açık kalırsa kayıt sayfası olmasa da API'den hesap açılabilir (onaysız kalır, yine de kapatın).
 - Authentication → Providers → Email: **Confirm email açık** olmalı. Davet listesi yalnız e-posta
   doğrulanınca uygulanır; kapalıysa başkası Ata'nın adresiyle kayıt olup superadmin olabilir.
 - Authentication → URL Configuration: Site URL `https://hymf-portal.vercel.app`; Redirect URLs'e
@@ -25,11 +28,14 @@ Dashboard → Database → Backups).
    Tekrar çalıştırmak güvenlidir. Not: ilk çalıştırmada mevcut tüm hesaplar onaysız olur (eski kayıt
    akışı rolü metadata'dan aldığı için güvenilmez); davet listesindekiler 3. adımda yeniden onaylanır,
    diğerlerini /yonetim'den onaylayın.
-3. `supabase/seed_uyeler.sql` dosyasını çalıştırın.
-4. `supabase/tests/rls_kontrol.sql` → son satır **"Tüm RLS kontrolleri geçti"** olmalı. Ardından
+3. `supabase/migrations/20261010000000_icerik.sql` dosyasını çalıştırın (duyuru, kaynak, ders,
+   toplantı için silme kuralları ve bağlantı kısıtları). 2. adımı yeniden çalıştırırsanız bunu da
+   ardından yeniden çalıştırın; 2. adım bu tabloların kurallarını silip yeniden kurar.
+4. `supabase/seed_uyeler.sql` dosyasını çalıştırın.
+5. `supabase/tests/rls_kontrol.sql` → son satır **"Tüm RLS kontrolleri geçti"** olmalı. Ardından
    `supabase/tests/kayit_akisi.sql` → **"Kayıt akışı kontrolleri geçti"**. İkisi de her şeyi geri
    alır, gerçek veriye dokunmaz.
-5. Storage kontrolü:
+6. Storage kontrolü:
    `select id, public, file_size_limit from storage.buckets where id = 'workspace-files';`
    → `public = false`, `file_size_limit = 26214400`.
 
@@ -42,7 +48,10 @@ SQL Editor'de yapın.
 - `NEXT_PUBLIC_SUPABASE_URL` ve `NEXT_PUBLIC_SUPABASE_ANON_KEY` tanımlı olmalı.
 - `NEXT_PUBLIC_DEMO_MODE=false` ekleyin (`npx vercel env add NEXT_PUBLIC_DEMO_MODE production`).
   Tanımsız olması da kapalı demektir.
-- `SUPABASE_SERVICE_ROLE_KEY` gerekmez; eklemeyin.
+- `SUPABASE_SERVICE_ROLE_KEY` (Sensitive, production + preview): "Üye ekle" hesabı bununla açar.
+  Yalnız sunucuda, `src/lib/supabase/admin.ts` içinde ve davet satırı yöneticinin kendi oturumuyla
+  yazıldıktan sonra kullanılır. Değeri Supabase → Settings → API Keys → `service_role`.
+  `NEXT_PUBLIC_` önekiyle ASLA eklemeyin.
 
 ## 4. Canlıya alma
 

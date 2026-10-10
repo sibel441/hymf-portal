@@ -71,6 +71,8 @@ export function Navbar() {
         ...(isAdmin ? [{ href: '/yonetim', etiket: 'Yönetim' }] : []),
       ]
     : [];
+  // Girişsiz ziyaretçi yalnız ana sayfayı görür; içerik sayfalarının bağlantıları üyelere gösterilir.
+  const uyeBaglantilari = uye ? genelBaglantilar : [];
 
   async function cikis() {
     setKullaniciAcik(false);
@@ -135,7 +137,7 @@ export function Navbar() {
         </Link>
 
         <nav aria-label="Ana menü" className="hidden min-w-0 flex-1 items-center lg:flex">
-          {genelBaglantilar.map((b) => (
+          {uyeBaglantilari.map((b) => (
             <Link key={b.href} href={b.href} className={baglantiSinifi(b.href)} aria-current={aktifMi(pathname, b.href) ? 'page' : undefined}>
               {b.etiket}
             </Link>
@@ -184,11 +186,8 @@ export function Navbar() {
             </div>
           ) : (
             <div className="flex items-center gap-1">
-              <Link href="/giris" className={buttonClass({ variant: 'ghost', size: 'sm' })}>
-                Giriş
-              </Link>
-              <Link href="/kayit" className={buttonClass({ variant: 'secondary', size: 'sm', className: 'hidden sm:inline-flex' })}>
-                Kayıt ol
+              <Link href="/giris" className={buttonClass({ variant: 'secondary', size: 'sm' })}>
+                Giriş yap
               </Link>
             </div>
           )}
@@ -209,7 +208,7 @@ export function Navbar() {
       {mobilAcik && (
         <nav id="mobil-menu" aria-label="Ana menü" className="border-t border-line lg:hidden">
           <ul className="mx-auto max-w-6xl px-2 py-2">
-            {[...ozelBaglantilar, ...genelBaglantilar].map((b) => (
+            {[...ozelBaglantilar, ...uyeBaglantilari].map((b) => (
               <li key={b.href}>
                 <Link
                   href={b.href}
@@ -223,13 +222,6 @@ export function Navbar() {
                 </Link>
               </li>
             ))}
-            {!profile && !isLoading && (
-              <li>
-                <Link href="/kayit" className="block rounded-md px-3 py-2.5 text-base text-ink-2 hover:bg-sunken hover:text-ink sm:hidden">
-                  Kayıt ol
-                </Link>
-              </li>
-            )}
           </ul>
         </nav>
       )}

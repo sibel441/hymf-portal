@@ -1,7 +1,10 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { GECICI_OTURUM_CEREZI, oturumSecenekleri } from './hatirla';
 
-const KORUMALI = ['/calisma-alani', '/yonetim', '/profil', '/uyeler', '/onay-bekleniyor', '/sifre-yenile'];
+// Girişsiz ziyaretçi yalnız ana sayfayı, giriş sayfasını ve e-posta bağlantısı dönüşünü görür;
+// geri kalan her yol girişe yönlendirilir.
+const ACIK_YOLLAR = ['/giris', '/auth'];
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -19,7 +22,10 @@ export async function updateSession(request: NextRequest) {
       setAll(cookiesToSet, headers) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
         response = NextResponse.next({ request });
-        cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+        const gecici = request.cookies.has(GECICI_OTURUM_CEREZI);
+        cookiesToSet.forEach(({ name, value, options }) =>
+          response.cookies.set(name, value, oturumSecenekleri(options, gecici))
+        );
         Object.entries(headers).forEach(([k, v]) => response.headers.set(k, v));
       },
     },
@@ -28,7 +34,7 @@ export async function updateSession(request: NextRequest) {
   // createServerClient ile getClaims arasında başka kod yok
   const { data } = await supabase.auth.getClaims();
   const path = request.nextUrl.pathname;
-  const korumali = KORUMALI.some((p) => path === p || path.startsWith(p + '/'));
+  const korumali = path !== '/' && !ACIK_YOLLAR.some((p) => path === p || path.startsWith(p + '/'));
 
   if (!data?.claims?.sub && korumali) {
     const url = request.nextUrl.clone();

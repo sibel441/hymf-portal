@@ -51,6 +51,21 @@ export async function requireMember(): Promise<Profile> {
   return profil;
 }
 
+/** Server action'lar için: yönlendirmek yerine hata fırlatır (action'lar try/catch içinde çağırır). */
+export async function requireMemberAction(): Promise<Profile> {
+  const profil = await getMevcutProfil();
+
+  if (!profil) {
+    throw new Error('Bu işlem için oturum açmanız gerekir.');
+  }
+
+  if (!isMember(profil)) {
+    throw new Error('Bu işlem için yetkiniz yok.');
+  }
+
+  return profil;
+}
+
 export async function requireAdminAction(): Promise<Profile> {
   const profil = await getMevcutProfil();
 

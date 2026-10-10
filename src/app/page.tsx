@@ -74,18 +74,15 @@ export default async function HomePage() {
               Hesap durumunu gör
             </Link>
           ) : (
-            <>
-              <Link href="/giris" className={buttonClass({ variant: 'primary' })}>
-                Giriş yap
-              </Link>
-              <Link href="/kayit" className={buttonClass({ variant: 'secondary' })}>
-                Kayıt ol
-              </Link>
-            </>
+            <Link href="/giris" className={buttonClass({ variant: 'primary' })}>
+              Giriş yap
+            </Link>
           )}
         </div>
         {!ben && (
-          <p className="mt-4 text-sm text-ink-3">Plan takibi ve üye listesi grup üyelerine açıktır.</p>
+          <p className="mt-4 text-sm text-ink-3">
+            Portal grup üyelerine açıktır. Hesaplar grup yöneticileri tarafından açılır.
+          </p>
         )}
       </section>
 
@@ -118,21 +115,23 @@ export default async function HomePage() {
         </section>
       )}
 
-      <section aria-labelledby="ana-kaynaklar" className="border-t border-line pt-8">
-        <h2 id="ana-kaynaklar" className="font-serif text-2xl text-ink">
-          Grup kaynakları
-        </h2>
-        <ul className="mt-5 grid gap-x-10 sm:grid-cols-2">
-          {kaynaklar.map((k) => (
-            <li key={k.href} className="border-t border-line">
-              <Link href={k.href} className="group block py-4">
-                <span className="text-base font-medium text-ink group-hover:underline">{k.baslik}</span>
-                <span className="mt-1 block text-sm text-ink-2">{k.aciklama}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
+      {uye && (
+        <section aria-labelledby="ana-kaynaklar" className="border-t border-line pt-8">
+          <h2 id="ana-kaynaklar" className="font-serif text-2xl text-ink">
+            Grup kaynakları
+          </h2>
+          <ul className="mt-5 grid gap-x-10 sm:grid-cols-2">
+            {kaynaklar.map((k) => (
+              <li key={k.href} className="border-t border-line">
+                <Link href={k.href} className="group block py-4">
+                  <span className="text-base font-medium text-ink group-hover:underline">{k.baslik}</span>
+                  <span className="mt-1 block text-sm text-ink-2">{k.aciklama}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {kadroGruplari.length > 0 && (
         <section aria-labelledby="ana-uyeler" className="border-t border-line pt-8">

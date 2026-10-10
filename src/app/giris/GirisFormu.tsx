@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { hatirlamaTercihiniYaz } from '@/lib/supabase/hatirla';
 import { DEMO_MODU } from '@/lib/demo';
 import { INITIAL_PROFILES } from '@/lib/mockData';
 import { useAuth } from '@/context/AuthContext';
@@ -22,6 +22,7 @@ export function GirisFormu({ next, hataParam }: GirisFormuProps) {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [beniHatirla, setBeniHatirla] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(hataParam);
   const [isForgotOpen, setIsForgotOpen] = useState(false);
@@ -38,6 +39,7 @@ export function GirisFormu({ next, hataParam }: GirisFormuProps) {
 
     if (hasValidSupabase) {
       try {
+        hatirlamaTercihiniYaz(beniHatirla);
         const supabase = createClient();
         const { error } = await supabase.auth.signInWithPassword({ email, password });
 
@@ -142,16 +144,23 @@ export function GirisFormu({ next, hataParam }: GirisFormuProps) {
           />
         </div>
 
+        <label className="flex items-center gap-2 text-sm text-ink-2 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={beniHatirla}
+            onChange={(e) => setBeniHatirla(e.target.checked)}
+            className="h-4 w-4 rounded border-line accent-primary"
+          />
+          Beni hatırla
+        </label>
+
         <Button type="submit" variant="primary" disabled={isLoading} className="w-full">
           {isLoading ? 'Giriş yapılıyor…' : 'Giriş yap'}
         </Button>
       </form>
 
       <div className="text-sm text-ink-2">
-        Hesabınız yok mu?{' '}
-        <Link href="/kayit" className="text-link hover:underline font-medium">
-          Kayıt olun
-        </Link>
+        Hesabınız yok mu? Hesapları grup yöneticileri açar; onlara yazın.
       </div>
 
       {DEMO_MODU && (

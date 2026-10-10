@@ -31,10 +31,18 @@ export function DavetYonetimi({
     kadro: '' as Kadro | '',
     yetki: 'uye' as Yetki | '',
     danismanEmail: '' as string,
+    sifre: '',
   });
 
+  const sifreUret = () => {
+    // Karışan karakterler (0/O, 1/l/I) yok; 12 karakter.
+    const harfler = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const rastgele = crypto.getRandomValues(new Uint32Array(12));
+    setFormData((f) => ({ ...f, sifre: Array.from(rastgele, (n) => harfler[n % harfler.length]).join('') }));
+  };
+
   const handleAddInvite = async () => {
-    if (!formData.email || !formData.full_name || !formData.kadro || !formData.yetki) {
+    if (!formData.email || !formData.full_name || !formData.kadro || !formData.yetki || !formData.sifre) {
       setMessage({ type: 'error', text: 'Tüm zorunlu alanları doldurunuz.' });
       return;
     }
@@ -47,11 +55,15 @@ export function DavetYonetimi({
         kadro: formData.kadro as Kadro,
         yetki: formData.yetki as Yetki,
         danismanEmail: formData.danismanEmail || undefined,
+        sifre: formData.sifre,
       });
 
       if (result.ok) {
-        setMessage({ type: 'success', text: 'Davet listesine eklendi' });
-        setFormData({ email: '', full_name: '', kadro: '', yetki: 'uye', danismanEmail: '' });
+        setMessage({
+          type: 'success',
+          text: `Hesap açıldı. Giriş bilgilerini kişiye iletin: ${formData.email.trim().toLowerCase()} / ${formData.sifre}`,
+        });
+        setFormData({ email: '', full_name: '', kadro: '', yetki: 'uye', danismanEmail: '', sifre: '' });
       } else {
         setMessage({ type: 'error', text: result.error });
       }
@@ -114,8 +126,8 @@ export function DavetYonetimi({
       )}
 
       <Panel
-        baslik="Yeni davet ekle"
-        aciklama="Bu listedeki e-postayla kayıt olan kişi, adresini doğruladıktan sonra otomatik onaylanır ve buradaki kadro ile yetkiyi alır."
+        baslik="Üye ekle"
+        aciklama="Hesap hemen açılır ve onaylanır; kişi buradaki kadro ve yetkiyi alır. Geçici şifreyi kişiye iletin, ilk girişten sonra Profil'den değiştirebilir. Listede olup hesabı olmayan biri için aynı e-postayla formu doldurun."
       >
         <div className="space-y-4">
           <Alan etiket="E-posta" htmlFor="invite-email">
@@ -188,12 +200,29 @@ export function DavetYonetimi({
             </Alan>
           )}
 
+          <Alan etiket="Geçici şifre" htmlFor="invite-sifre">
+            <div className="flex gap-2">
+              <input
+                id="invite-sifre"
+                type="text"
+                autoComplete="off"
+                className={inputSinifi}
+                value={formData.sifre}
+                onChange={(e) => setFormData({ ...formData, sifre: e.target.value })}
+                placeholder="En az 8 karakter"
+              />
+              <Button type="button" variant="secondary" onClick={sifreUret}>
+                Üret
+              </Button>
+            </div>
+          </Alan>
+
           <Button
             variant="primary"
-            disabled={loading || !formData.email || !formData.full_name || !formData.kadro}
+            disabled={loading || !formData.email || !formData.full_name || !formData.kadro || formData.sifre.length < 8}
             onClick={handleAddInvite}
           >
-            Davet listesine ekle
+            Hesabı aç
           </Button>
         </div>
       </Panel>
