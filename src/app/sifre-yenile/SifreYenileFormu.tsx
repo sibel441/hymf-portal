@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Uyari } from '@/components/ui/Uyari';
-import { Alan, inputSinifi } from '@/components/ui';
+import { Alan, SifreInput } from '@/components/ui';
 
 export function SifreYenileFormu() {
   const [password, setPassword] = useState('');
@@ -77,26 +77,24 @@ export function SifreYenileFormu() {
       {!successMessage && (
         <form onSubmit={handleUpdatePassword} className="space-y-5">
           <Alan etiket="Yeni Şifre (en az 8 karakter)" htmlFor="password">
-            <input
+            <SifreInput
               id="password"
-              type="password"
               required
+              autoComplete="new-password"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={inputSinifi}
             />
           </Alan>
 
           <Alan etiket="Şifre Tekrarı" htmlFor="confirmPassword">
-            <input
+            <SifreInput
               id="confirmPassword"
-              type="password"
               required
+              autoComplete="new-password"
               placeholder="••••••••"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className={inputSinifi}
             />
           </Alan>
 

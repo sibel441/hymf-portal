@@ -9,7 +9,7 @@ import { INITIAL_PROFILES } from '@/lib/mockData';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/Button';
 import { Uyari } from '@/components/ui/Uyari';
-import { Alan, inputSinifi } from '@/components/ui';
+import { Alan, inputSinifi, SifreInput } from '@/components/ui';
 
 interface GirisFormuProps {
   next: string;
@@ -96,20 +96,16 @@ export function GirisFormu({ next, hataParam }: GirisFormuProps) {
           />
         </Alan>
 
-        <div className="space-y-1.5">
-          <label htmlFor="password" className="mb-2 block text-sm font-medium text-ink">
-            Şifre
-          </label>
-          <input
+        <Alan etiket="Şifre" htmlFor="password">
+          <SifreInput
             id="password"
-            type="password"
             required
+            autoComplete="current-password"
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className={inputSinifi}
           />
-        </div>
+        </Alan>
 
         <label className="flex items-center gap-2 text-sm text-ink-2 cursor-pointer select-none">
           <input

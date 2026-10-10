@@ -10,6 +10,7 @@ export { SayfaBasligi } from './SayfaBasligi';
 export { BosDurum } from './BosDurum';
 export { Uyari } from './Uyari';
 export { Alan, inputSinifi, textareaSinifi, selectSinifi } from './form';
+export { SifreInput } from './SifreInput';
 export { Sekmeler } from './Sekmeler';
 export { ErisimEngellendi } from './ErisimEngellendi';
 export { OrnekVeriNotu } from './OrnekVeriNotu';
