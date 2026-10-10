@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { GECICI_OTURUM_CEREZI, oturumSecenekleri } from './hatirla';
 
 export async function createClient() {
   const cookieStore = await cookies();
@@ -13,8 +14,9 @@ export async function createClient() {
       },
       setAll(cookiesToSet) {
         try {
+          const gecici = cookieStore.has(GECICI_OTURUM_CEREZI);
           cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
+            cookieStore.set(name, value, oturumSecenekleri(options, gecici))
           );
         } catch {
           // Server Component içinden çağrıldığında setAll sessizce geçilebilir

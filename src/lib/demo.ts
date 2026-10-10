@@ -1,0 +1,1 @@
+export const DEMO_MODU = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';

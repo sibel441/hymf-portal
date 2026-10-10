@@ -2,18 +2,11 @@
 
 import React, { useState } from 'react';
 import {
-  BookOpen,
   CheckCircle2,
   Cpu,
-  Download,
-  ExternalLink,
   FileCode,
-  HardDrive,
-  Key,
   Layers,
   Network,
-  Terminal,
-  Wrench,
 } from 'lucide-react';
 import { CodeBlock } from '@/components/CodeBlock';
 
@@ -22,86 +15,78 @@ export default function GuidesPage() {
 
   return (
     <div className="space-y-8">
-      {/* Başlık ve Açıklama */}
-      <div className="border-b border-slate-800 pb-5">
-        <div className="flex items-center gap-2 text-xs font-mono text-amber-400 mb-1">
-          <Wrench className="w-4 h-4" />
-          <span>TEKNİK ALTYAPI VE HESAPLAMA KILAVUZLARI</span>
-        </div>
-        <h1 className="text-2xl sm:text-3xl font-bold font-serif text-white">
-          Hızlı Kılavuzlar (Manuals)
-        </h1>
-        <p className="text-xs sm:text-sm text-slate-400 mt-2 max-w-3xl">
-          TÜBİTAK ULAKBİM TRUBA süperbilgisayar aktivasyonu, VASP/LAMMPS hesaplama betikleri ve Ankara Üniversitesi yerleşke dışı VPN kurulum yönergeleri.
+      <div>
+        <h1 className="font-serif text-2xl sm:text-4xl text-ink">Hızlı kılavuzlar</h1>
+        <p className="text-base text-ink-2 mt-2 max-w-prose">
+          TRUBA süperbilgisayar aktivasyonu, VASP ve LAMMPS hesaplama betikleri, Ankara Üniversitesi yerleşke dışı VPN.
         </p>
       </div>
 
       {/* Sekmeler (Tabs) */}
-      <div className="flex flex-wrap gap-2 border-b border-slate-800 pb-2">
+      <div className="flex flex-wrap gap-2 border-b border-line pb-2">
         <button
           onClick={() => setActiveTab('truba')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition cursor-pointer ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition cursor-pointer ${
             activeTab === 'truba'
-              ? 'bg-red-800 text-white shadow-sm'
-              : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+              ? 'bg-primary text-on-primary'
+              : 'bg-sunken text-ink-2 hover:bg-sunken border border-line'
           }`}
         >
           <Cpu className="w-4 h-4" />
-          <span>TRUBA Aktivasyonu & Slurm</span>
+          <span>TRUBA aktivasyonu</span>
         </button>
 
         <button
           onClick={() => setActiveTab('vasp')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition cursor-pointer ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition cursor-pointer ${
             activeTab === 'vasp'
-              ? 'bg-red-800 text-white shadow-sm'
-              : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+              ? 'bg-primary text-on-primary'
+              : 'bg-sunken text-ink-2 hover:bg-sunken border border-line'
           }`}
         >
           <FileCode className="w-4 h-4" />
-          <span>VASP Kılavuzu & INCAR</span>
+          <span>VASP kılavuzu</span>
         </button>
 
         <button
           onClick={() => setActiveTab('lammps')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition cursor-pointer ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition cursor-pointer ${
             activeTab === 'lammps'
-              ? 'bg-red-800 text-white shadow-sm'
-              : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+              ? 'bg-primary text-on-primary'
+              : 'bg-sunken text-ink-2 hover:bg-sunken border border-line'
           }`}
         >
           <Layers className="w-4 h-4" />
-          <span>LAMMPS Moleküler Dinamik</span>
+          <span>LAMMPS moleküler dinamik</span>
         </button>
 
         <button
           onClick={() => setActiveTab('vpn')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition cursor-pointer ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition cursor-pointer ${
             activeTab === 'vpn'
-              ? 'bg-red-800 text-white shadow-sm'
-              : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+              ? 'bg-primary text-on-primary'
+              : 'bg-sunken text-ink-2 hover:bg-sunken border border-line'
           }`}
         >
           <Network className="w-4 h-4" />
-          <span>Okul VPN & Veri Tabanları</span>
+          <span>Okul VPN ve veri tabanları</span>
         </button>
       </div>
 
       {/* SEKME 1: TRUBA */}
       {activeTab === 'truba' && (
         <div className="space-y-6">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4">
-            <h2 className="text-lg font-bold text-white font-serif flex items-center gap-2">
-              <Key className="w-5 h-5 text-amber-400" />
-              1. TRUBA Hesap Aktivasyonu ve SSH Bağlantısı
+          <div className="bg-surface border border-line rounded-lg p-6 space-y-4">
+            <h2 className="text-lg font-semibold text-ink">
+              TRUBA hesap aktivasyonu ve SSH bağlantısı
             </h2>
-            <div className="text-xs text-slate-300 space-y-3 leading-relaxed">
+            <div className="text-sm text-ink-2 space-y-3 leading-relaxed">
               <p>
-                TÜBİTAK ULAKBİM TRUBA hesapları grup liderimiz Prof. Dr. danışmanlığındaki araştırma projesi kapsamında tanımlanır. Hesabınız açıldıktan sonra aşağıdaki adımları izleyiniz:
+                TRUBA hesapları grup liderimiz Prof. Dr. danışmanlığındaki araştırma projesi kapsamında tanımlanır. Hesabınız açıldıktan sonra aşağıdaki adımları izleyiniz:
               </p>
               <ol className="list-decimal list-inside space-y-2 pl-2">
                 <li>
-                  <strong className="text-white">SSH Anahtarı Oluşturma:</strong> Terminalinizde (Linux / macOS / PowerShell) SSH anahtar çifti oluşturun:
+                  <strong className="text-ink">SSH anahtarı oluşturma:</strong> Terminalinizde (Linux / macOS / PowerShell) SSH anahtar çifti oluşturun:
                 </li>
               </ol>
             </div>
@@ -116,9 +101,9 @@ ssh-keygen -t ed25519 -C "ad.soyad@ankara.edu.tr"
 cat ~/.ssh/id_ed25519.pub`}
             />
 
-            <div className="text-xs text-slate-300 space-y-2">
+            <div className="text-sm text-ink-2 space-y-2">
               <p>
-                Genel anahtarınızı (public key) <a href="https://portal.truba.gov.tr" target="_blank" rel="noopener noreferrer" className="text-red-400 underline">portal.truba.gov.tr</a> adresine giriş yaparak profilinizdeki SSH anahtarları bölümüne ekleyiniz.
+                Genel anahtarınızı (public key) <a href="https://portal.truba.gov.tr" target="_blank" rel="noopener noreferrer" className="text-link underline">portal.truba.gov.tr</a> adresine giriş yaparak profilinizdeki SSH anahtarları bölümüne ekleyiniz.
               </p>
               <p>Anahtar onaylandıktan sonra bağlantı komutu:</p>
             </div>
@@ -131,13 +116,12 @@ cat ~/.ssh/id_ed25519.pub`}
           </div>
 
           {/* Standart Barbun VASP Slurm Betiği */}
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4">
-            <h2 className="text-lg font-bold text-white font-serif flex items-center gap-2">
-              <Terminal className="w-5 h-5 text-emerald-400" />
-              2. Standart TRUBA Barbun VASP Slurm İş Betiği
+          <div className="bg-surface border border-line rounded-lg p-6 space-y-4">
+            <h2 className="text-lg font-semibold text-ink">
+              Standart TRUBA Barbun VASP Slurm iş betiği
             </h2>
-            <p className="text-xs text-slate-400">
-              Aşağıdaki Slurm betiğini hesaplama klasörünüzde <code>run_vasp.sh</code> adıyla kaydedip <code>sbatch run_vasp.sh</code> komutu ile sıraya gönderebilirsiniz:
+            <p className="text-sm text-ink-2">
+              Aşağıdaki Slurm betiğini hesaplama klasörünüzde <code className="font-mono">run_vasp.sh</code> adıyla kaydedip <code className="font-mono">sbatch run_vasp.sh</code> komutu ile sıraya gönderebilirsiniz:
             </p>
 
             <CodeBlock
@@ -180,18 +164,17 @@ echo "[HYMF] Bitis Zamani: $(date)"`}
       {/* SEKME 2: VASP */}
       {activeTab === 'vasp' && (
         <div className="space-y-6">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4">
-            <h2 className="text-lg font-bold text-white font-serif flex items-center gap-2">
-              <FileCode className="w-5 h-5 text-red-400" />
-              VASP 4 Temel Giriş Dosyası ve INCAR Şablonu
+          <div className="bg-surface border border-line rounded-lg p-6 space-y-4">
+            <h2 className="text-lg font-semibold text-ink">
+              VASP 4 temel giriş dosyası ve INCAR şablonu
             </h2>
-            <p className="text-xs text-slate-300 leading-relaxed">
+            <p className="text-sm text-ink-2 leading-relaxed">
               VASP çalıştırmak için çalışma dizininde 4 dosya bulunmalıdır: <strong>INCAR</strong> (hesaplama parametreleri), <strong>POSCAR</strong> (atomik koordinatlar), <strong>KPOINTS</strong> (Brillouin bölgesi örneklemesi) ve <strong>POTCAR</strong> (pseudopotansiyeller).
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-              <div className="p-4 rounded-lg bg-slate-950 border border-slate-800 space-y-2">
-                <span className="text-xs font-bold text-slate-200">KPOINTS (Monkhorst-Pack Şablonu)</span>
+              <div className="p-4 rounded-md bg-sunken border border-line space-y-2">
+                <span className="text-sm font-semibold text-ink">KPOINTS (Monkhorst-Pack şablonu)</span>
                 <CodeBlock
                   title="KPOINTS Dosyası"
                   language="text"
@@ -203,8 +186,8 @@ Monkhorst-Pack
                 />
               </div>
 
-              <div className="p-4 rounded-lg bg-slate-950 border border-slate-800 space-y-2">
-                <span className="text-xs font-bold text-slate-200">POTCAR Birleştirme Komutu</span>
+              <div className="p-4 rounded-md bg-sunken border border-line space-y-2">
+                <span className="text-sm font-semibold text-ink">POTCAR birleştirme komutu</span>
                 <CodeBlock
                   title="POTCAR Hazırlama (Örn: Mo ve S için)"
                   language="bash"
@@ -214,8 +197,8 @@ Monkhorst-Pack
             </div>
 
             <div className="pt-3">
-              <h3 className="text-xs font-bold text-slate-200 mb-2 uppercase tracking-wide">
-                Önerilen Geometri Optimizasyonu INCAR Parametreleri
+              <h3 className="text-sm font-semibold text-ink mb-2">
+                Önerilen geometri optimizasyonu INCAR parametreleri
               </h3>
               <CodeBlock
                 title="INCAR (Geometri Relaksasyonu)"
@@ -251,12 +234,11 @@ LCHARG = .TRUE.    # CHGCAR çıktısını al`}
       {/* SEKME 3: LAMMPS */}
       {activeTab === 'lammps' && (
         <div className="space-y-6">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4">
-            <h2 className="text-lg font-bold text-white font-serif flex items-center gap-2">
-              <Layers className="w-5 h-5 text-blue-400" />
-              LAMMPS Moleküler Dinamik ve Simülasyon Kılavuzu
+          <div className="bg-surface border border-line rounded-lg p-6 space-y-4">
+            <h2 className="text-lg font-semibold text-ink">
+              LAMMPS moleküler dinamik ve simülasyon kılavuzu
             </h2>
-            <p className="text-xs text-slate-300 leading-relaxed">
+            <p className="text-sm text-ink-2 leading-relaxed">
               Büyük atomik sistemlerin termal iletkenlik, difüzyon ve faz dönüşümü analizleri için LAMMPS yazılımı kullanılır.
             </p>
 
@@ -293,26 +275,25 @@ run            50000   # 50 ps`}
       {/* SEKME 4: VPN */}
       {activeTab === 'vpn' && (
         <div className="space-y-6">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4">
-            <h2 className="text-lg font-bold text-white font-serif flex items-center gap-2">
-              <Network className="w-5 h-5 text-emerald-400" />
-              Ankara Üniversitesi Kampüs Dışı Erişim (VPN & Proxy)
+          <div className="bg-surface border border-line rounded-lg p-6 space-y-4">
+            <h2 className="text-lg font-semibold text-ink">
+              Ankara Üniversitesi kampüs dışı erişim
             </h2>
-            <div className="text-xs text-slate-300 space-y-3 leading-relaxed">
+            <div className="text-sm text-ink-2 space-y-3 leading-relaxed">
               <p>
                 Kampüs dışından makale indirirken (ScienceDirect, APS Physical Review, AIP, Nature, IEEE) okul IP adresinden görünmek için FortiClient VPN veya Vetis portalı kullanılır:
               </p>
               <ul className="space-y-2 pl-2">
                 <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-4 h-4 text-ok shrink-0 mt-0.5" />
                   <div>
-                    <strong className="text-white">FortiClient SSL-VPN:</strong> Ankara Üniversitesi Bilgi İşlem Daire Başkanlığı sayfasından FortiClient yazılımını indirin. Sunucu adresi: <code>vpn.ankara.edu.tr</code>, Port: <code>10443</code>. Kullanıcı adı ve şifreniz olarak kurumsal e-posta bilgilerinizi giriniz.
+                    <strong className="text-ink">FortiClient SSL-VPN:</strong> Ankara Üniversitesi Bilgi İşlem Daire Başkanlığı sayfasından FortiClient yazılımını indirin. Sunucu adresi: <code className="font-mono">vpn.ankara.edu.tr</code>, bağlantı noktası: <code className="font-mono">10443</code>. Kullanıcı adı ve şifre olarak kurumsal e-posta bilgilerinizi giriniz.
                   </div>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-4 h-4 text-ok shrink-0 mt-0.5" />
                   <div>
-                    <strong className="text-white">VETİS (Uzaktan Kütüphane Portalı):</strong> Herhangi bir yazılım kurmadan <a href="https://kutuphane.ankara.edu.tr" target="_blank" rel="noopener noreferrer" className="text-red-400 underline">kutuphane.ankara.edu.tr</a> üzerinden VETİS sistemine giriş yaparak akademik veri tabanlarına doğrudan erişebilirsiniz.
+                    <strong className="text-ink">VETİS (Uzaktan kütüphane portalı):</strong> Herhangi bir yazılım kurmadan <a href="https://kutuphane.ankara.edu.tr" target="_blank" rel="noopener noreferrer" className="text-link underline">kutuphane.ankara.edu.tr</a> üzerinden VETİS sistemine giriş yaparak akademik veri tabanlarına doğrudan erişebilirsiniz.
                   </div>
                 </li>
               </ul>

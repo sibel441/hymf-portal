@@ -23,7 +23,7 @@ const jetbrains = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: 'HYMF Portal | Ankara Üniversitesi Hesaplamalı Yoğun Madde Fiziği',
-  description: 'Ankara Üniversitesi Fen Fakültesi / Enstitüsü Hesaplamalı Yoğun Madde Fiziği Araştırma Grubu Özel Akademik Portalı',
+  description: 'Ankara Üniversitesi Hesaplamalı Yoğun Madde Fiziği araştırma grubunun iç portalı.',
 };
 
 export default function RootLayout({
@@ -36,10 +36,10 @@ export default function RootLayout({
       lang="tr"
       className={`${inter.variable} ${newsreader.variable} ${jetbrains.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col text-slate-100 font-sans">
+      <body className="flex min-h-full flex-col bg-paper font-sans text-ink">
         <AuthProvider>
           <Navbar />
-          <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-10">
+          <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
             {children}
           </main>
           <Footer />
