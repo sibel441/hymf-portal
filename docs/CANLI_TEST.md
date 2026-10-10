@@ -20,6 +20,8 @@
 - Hata mesajını / ekran görüntüsünü al, yeni sohbette "docs/CANLI_TEST.md N. adımda şu oldu" diye yapıştır.
 
 ## Kalan işler
-- Supabase panelinden erişim token'ını sil (Account → Access Tokens).
+- Supabase erişim token'ı olası düzeltmeler için 17 Ekim'e kadar duruyor; o gün sil
+  (Account → Access Tokens).
 - Diğer 7 kişinin e-postaları gelince /yonetim → Üye ekle (liste: `supabase/seed_uyeler.sql` TODO satırları).
-- Sibel PR #1'i merge edince fork'ta "Sync fork".
+- PR #1'i merge et (upstream'de yazma yetkin var, Sibel'i beklemene gerek yok), sonra fork'ta
+  "Sync fork". Fork'un `main`'i otomatik canlıya çıkar; migration'lar çalıştığı için güvenli.
